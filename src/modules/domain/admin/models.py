@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -10,7 +10,7 @@ class CreateModel(BaseModel):
 
 class AdminLogins(BaseModel):
     username: str
-    status: str
+    status: Optional[str] = None 
     password: str
 
 

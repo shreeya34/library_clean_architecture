@@ -11,21 +11,25 @@ settings = Settings()
 postgres_manager = PostgresManager(settings=settings)
 db: Session = next(postgres_manager.get_db())
 
+
 def view_books(
     admin_username: str = typer.Option(..., help="Admin username"),
     admin_password: str = typer.Option(..., help="Admin password"),
-    title: str = typer.Option("", help="Search by book title (optional)")
+    title: str = typer.Option("", help="Search by book title (optional)"),
+    status: str = typer.Option("active") 
 ):
     admin_data = AdminLogins(username=admin_username, password=admin_password)
-    user = get_admins(admin_data, db)
-
-    if not user.get("is_admin"):
-        typer.echo("Access denied. Only admins can view books.")
-        raise typer.Exit()
+    admin_response = get_admins(admin_data, db)
+    
+    user = {
+        "username": admin_username,
+        "admin_id": admin_response["admin_id"],
+        "is_admin": True 
+    }
 
     result = core_view_books(title=title, db=db, user=user)
 
-    if not result["books"]:
+    if not result.get("books", []):
         typer.echo(result["message"])
     else:
         typer.echo(result["message"])

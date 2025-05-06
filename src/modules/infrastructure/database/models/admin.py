@@ -21,6 +21,7 @@ class Admin(Base):
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
+    
 
 
 class AdminLogin(Base):
@@ -78,3 +79,4 @@ class ViewMembers(Base):
     member_id = Column(String, unique=True, nullable=False)
     name = Column(String, unique=True, nullable=False)
     role = Column(String, nullable=False)
+

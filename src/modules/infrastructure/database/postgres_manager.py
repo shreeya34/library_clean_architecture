@@ -2,6 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from modules.infrastructure.database.interfaces import DatabaseManager, Base
 from typing import Generator
+from modules.infrastructure.database.models import *
+
 
 class PostgresManager(DatabaseManager):
     def __init__(self, settings):

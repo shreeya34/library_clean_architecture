@@ -109,16 +109,17 @@ def get_admins(admin_data: AdminLogins, db: Session = Depends(postgres_manager.g
         "message": "Login successful",
         "token": access_token,
         "admin_id": admin.admin_id,
-    }
+        "is_admin": True
 
+        
+    }
 
 def add_user_books(
     request: Request,
     newbook: NewBooks,
-    db: Session = Depends(postgres_manager.get_db),
-    user: dict = Depends(get_current_user),
+    db: Session,
+    user: dict,
 ):
-
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Access denied")
 
@@ -131,12 +132,7 @@ def add_user_books(
     if existing_logs:
         existing_logs.stock += newbook.stock
         existing_logs.available = existing_logs.stock > 0
-
         db.commit()
-
-        logger.info(
-            f"Book '{existing_logs.title}' updated successfully by {user['username']}. New stock: {existing_logs.stock}"
-        )
 
         return {
             "message": "Book updated successfully",
@@ -158,10 +154,6 @@ def add_user_books(
 
     commit_and_refresh(db, new_books_data)
 
-    logger.info(
-        f"New book '{new_books_data.title}' added successfully  Stock: {new_books_data.stock}"
-    )
-
     return {
         "message": "Book added successfully",
         "new_book": {
@@ -171,6 +163,7 @@ def add_user_books(
             "available": new_books_data.available,
         },
     }
+
 
 
 def get_member(
@@ -224,7 +217,6 @@ def view_available_books(
     else:
         books = db.query(Book).all()
 
-    
     if not books:
         logger.warning(f"No books found with title '{title}'.")
         return {"message": f"No books found with title '{title}'"}

@@ -1,3 +1,4 @@
+from fastapi import Request
 import typer
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.postgres_manager import PostgresManager
@@ -16,5 +17,8 @@ def add_book(
     stock: int = typer.Option(..., help="Number of copies available")
 ):
     book_data = NewBooks(title=title, author=author, stock=stock)
-    core_add_book(book_data, db)
+    fake_request = Request(scope={"type": "http"})  # Dummy request object
+    mock_user = {"username": "admin", "is_admin": True}
+    core_add_book(fake_request, book_data, db, mock_user)
     typer.echo(f"Book '{title}' by {author} added successfully with {stock} in stock.")
+
