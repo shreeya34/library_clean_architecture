@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from modules.infrastructure.database.interfaces import DatabaseManager, Base
+from modules.infrastructure.database.interfaces import DatabaseManager
+from modules.infrastructure.database.base import Base
 from typing import Generator
 from modules.infrastructure.database.models import *
 

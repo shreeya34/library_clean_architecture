@@ -4,15 +4,20 @@ from uuid import UUID
 
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.database.models.admin import Book, Member
-from modules.domain.member.models import  MemberLogins
+from modules.infrastructure.database.models.member import MemberLogins as MemberLoginsDB
+
 
 
 def get_member_by_name(db: Session, name: str) -> Member:
     return db.query(Member).filter(Member.name == name).first()
 
 
-def create_member_login(db: Session, member_id: UUID, name: str) -> MemberLogins:
-    new_login = MemberLogins(
+def create_member_login(db: Session, member_id: UUID, name: str) -> MemberLoginsDB:
+    """
+    Create a new login record for a member
+    Uses the SQLAlchemy MemberLogins model, not the Pydantic model
+    """
+    new_login = MemberLoginsDB(
         name=name,
         status="success",
         login_time=datetime.utcnow(),

@@ -17,6 +17,7 @@ class AdminLogins(BaseModel):
 class NewMember(BaseModel):
     name: str
     role: str
+    
 
 
 class NewBooks(BaseModel):

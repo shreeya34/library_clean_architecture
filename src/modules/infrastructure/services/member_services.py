@@ -17,7 +17,7 @@ from modules.infrastructure.database.models.member import BorrowedBooks, ReturnB
 from modules.infrastructure.database.models.admin import  Member
 from modules.domain.member.models import (
     BorrowBookRequest,
-    MemberLogins,
+    MemberLoginRequest,
     ReturnBookRequest,
 )
 from modules.infrastructure.database.postgres_manager import PostgresManager
@@ -32,21 +32,25 @@ logger = get_logger()
 
 postgres_manager = PostgresManager(settings)
 
-
-def member_logins(memberLogin: MemberLogins, db: Session = Depends( postgres_manager.get_db)) -> dict:
-
+def member_logins(memberLogin: MemberLoginRequest, db: Session) -> dict:
+    """
+    Process member login and create login record
+    """
     logger.info(f"Login for: {memberLogin.name}")
 
     member = get_member_by_name(db, memberLogin.name)
     if not member:
-        logger.warning(
-            "Failed login attempt for non-existent member: %s", memberLogin.name
-        )
+        logger.warning("Failed login attempt for non-existent member: %s", memberLogin.name)
         raise InvalidMemberCredentialsError(memberLogin.name)
+
+    # In a real application, you would verify the password here
+    # if not verify_password(memberLogin.password, member.hashed_password):
+    #     raise InvalidMemberCredentialsError(memberLogin.name)
 
     access_token = signJWT(member.name, member.member_id, is_admin=False)
     logger.info(f"Login successful for user: {memberLogin.name}")
 
+    # Create a login record in the database
     new_login = create_member_login(db, member.member_id, memberLogin.name)
 
     return {
@@ -54,7 +58,6 @@ def member_logins(memberLogin: MemberLogins, db: Session = Depends( postgres_man
         "member_id": member.member_id,
         "token": access_token,
     }
-
 
 def get_borrowed_books_data(
     book_body: BorrowBookRequest,

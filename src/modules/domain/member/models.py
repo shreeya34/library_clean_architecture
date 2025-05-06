@@ -1,9 +1,23 @@
+
+
+
+from datetime import datetime
 from pydantic import BaseModel
+from uuid import UUID
 
 
-class MemberLogins(BaseModel):
+class MemberLoginRequest(BaseModel):
     name: str
     password: str
+
+class MemberLoginInfo(BaseModel):
+    name: str
+    status: str
+    login_time: datetime
+    member_id: UUID
+    
+    class Config:
+        from_attributes = True 
 
 
 class ReturnBookRequest(BaseModel):

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from modules.domain.member.models import MemberLogins, BorrowBookRequest, ReturnBookRequest
 from modules.domain.member.response import BorrowedBookResponse
 
-class MemberServiceInterface(ABC):
+class MemberService(ABC):
     @abstractmethod
     def login_member(self, member_login: MemberLogins, db: Session) -> dict:
         pass

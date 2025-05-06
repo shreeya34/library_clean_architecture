@@ -7,7 +7,7 @@ from sqlalchemy import (
     Integer,
     String,
 )
-from modules.infrastructure.database.interfaces import Base
+from modules.infrastructure.database.base import Base
 from sqlalchemy import Column, Integer, String
 import uuid
 from sqlalchemy.orm import relationship

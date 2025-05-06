@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.dependency import get_db_from_app
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
 from modules.domain.member.models import (
-    MemberLogins,
+    
     BorrowBookRequest,
     ReturnBookRequest,
 )
@@ -27,22 +27,29 @@ logger = get_logger()
 router = APIRouter()
 
 
+from modules.domain.member.models import MemberLoginRequest
+
 @router.post("/member/login")
 def member_login(
-    memberLogin: MemberLogins, 
-                #  db: Session = Depends(get_db)):
-        db: Session = Depends(get_db_from_app)
-        ):
-
-    login_member = member_logins(memberLogin, db)
-    if login_member:
-        return {
+    memberLogin: MemberLoginRequest,
+    db: Session = Depends(get_db_from_app)
+):
+    """
+    Endpoint for member login
+    """
+    # try:
+    login_result = member_logins(memberLogin, db)
+    return {
             "message": "Login Success",
-            "member_id": login_member["member_id"],
-            "token": login_member["token"],
+            "member_id": login_result["member_id"],
+            "token": login_result["token"],
         }
-    else:
-        return {"error": "Invalid credentials"}
+    # except Exception as e:
+    #     logger.error(f"Internal Server Error: {str(e)}")
+    #     raise HTTPException(
+    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    #         detail=f"Internal Server Error: {str(e)}"
+    #     )
 
 
 @router.post(
