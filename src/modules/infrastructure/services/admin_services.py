@@ -169,8 +169,10 @@ def add_user_books(
 def get_member(
     request: Request,
     newuser: NewMember,
-    db: Session = Depends(postgres_manager.get_db),
-    user: dict = Depends(get_current_user),
+    db: Session,
+    user: dict
+    # db: Session = Depends(postgres_manager.get_db),
+    # user: dict = Depends(get_current_user),
 ):
 
     if not user.get("is_admin"):

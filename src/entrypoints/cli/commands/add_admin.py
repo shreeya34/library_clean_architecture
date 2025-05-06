@@ -4,7 +4,6 @@ from modules.infrastructure.database.postgres_manager import PostgresManager
 from modules.domain.admin.models import CreateModel
 from modules.infrastructure.services.admin_services import add_admin as core_add_admin
 from modules.infrastructure.config.settings import Settings  
-# Initialize settings
 settings = Settings()
 
 

@@ -15,7 +15,6 @@ from modules.domain.exceptions.admin.exception import RaiseUnauthorizedError
 
 from modules.infrastructure.database.models.member import BorrowedBooks, ReturnBook
 from modules.infrastructure.database.models.admin import  Member
-from entrypoints.api.utils.response_utils import json_response
 from modules.domain.member.models import (
     BorrowBookRequest,
     MemberLogins,
