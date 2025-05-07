@@ -2,13 +2,13 @@ from .admin import Admin, AdminLogin, Book, BookAvailability, Member, ViewMember
 from .member import BorrowedBooks, MemberLogins, ReturnBook
 
 __all__ = [
-    'Admin',
-    'AdminLogin',
-    'Book',
-    'BookAvailability',
-    'Member',
-    'ViewMembers',
-    'BorrowedBooks',
-    'MemberLogins',
-    'ReturnBook'
+    "Admin",
+    "AdminLogin",
+    "Book",
+    "BookAvailability",
+    "Member",
+    "ViewMembers",
+    "BorrowedBooks",
+    "MemberLogins",
+    "ReturnBook",
 ]

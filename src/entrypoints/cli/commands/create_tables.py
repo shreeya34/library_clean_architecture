@@ -1,8 +1,9 @@
 from modules.infrastructure.database.postgres_manager import PostgresManager
-from modules.infrastructure.config.settings import Settings  
+from modules.infrastructure.config.settings import Settings
 import typer
 
 app = typer.Typer()
+
 
 @app.command("create-tables")
 def create_tables():

@@ -19,7 +19,7 @@ class PostgresManager(DatabaseManager):
                 f"@{self.settings.database_host}:{self.settings.database_port}/{self.settings.database_name}",
                 pool_size=20,
                 max_overflow=0,
-                pool_pre_ping=True
+                pool_pre_ping=True,
             )
         return self.engine
 
@@ -32,9 +32,7 @@ class PostgresManager(DatabaseManager):
     def get_db(self) -> Generator[Session, None, None]:
         if not self.SessionLocal:
             self.SessionLocal = sessionmaker(
-                autocommit=False,
-                autoflush=False,
-                bind=self.get_engine()
+                autocommit=False, autoflush=False, bind=self.get_engine()
             )
 
         db = self.SessionLocal()
@@ -46,8 +44,6 @@ class PostgresManager(DatabaseManager):
     def get_session(self) -> Session:
         if not self.SessionLocal:
             self.SessionLocal = sessionmaker(
-                autocommit=False,
-                autoflush=False,
-                bind=self.get_engine()
+                autocommit=False, autoflush=False, bind=self.get_engine()
             )
         return self.SessionLocal()

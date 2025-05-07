@@ -7,13 +7,12 @@ from modules.infrastructure.database.models.admin import Book, Member
 from modules.infrastructure.database.models.member import MemberLogins as MemberLoginsDB
 
 
-
 def get_member_by_name(db: Session, name: str) -> Member:
     return db.query(Member).filter(Member.name == name).first()
 
 
 def create_member_login(db: Session, member_id: UUID, name: str) -> MemberLoginsDB:
-   
+
     new_login = MemberLoginsDB(
         name=name,
         status="success",

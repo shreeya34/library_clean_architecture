@@ -1,5 +1,11 @@
 from sqlalchemy.orm import Session
-from modules.infrastructure.database.models.admin import Admin, Book, BookAvailability, Member, ViewMembers
+from modules.infrastructure.database.models.admin import (
+    Admin,
+    Book,
+    BookAvailability,
+    Member,
+    ViewMembers,
+)
 
 
 def get_admin_by_username(db: Session, username: str):

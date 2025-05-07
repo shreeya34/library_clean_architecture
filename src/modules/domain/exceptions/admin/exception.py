@@ -1,63 +1,66 @@
-from fastapi import HTTPException
-from typing import List
+from modules.domain.exceptions.base import LibraryHTTPException
 
 
-class AdminAlreadyExistsError(HTTPException):
+class AdminAlreadyExistsError(LibraryHTTPException):
     def __init__(self, name: str):
-        self.status_code = 400
-        self.detail = f"Admin with the name '{name}' already exists!"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=400, 
+            detail=f"Admin with the name '{name}' already exists!"
+        )
 
 
-class InvalidAdminCredentialsError(HTTPException):
+class InvalidAdminCredentialsError(LibraryHTTPException):
     def __init__(self, name: str):
-        self.status_code = 401
-        self.detail = f"Invalid credentials for admin '{name}'"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=401,
+            detail=f"Invalid credentials for admin '{name}'"
+        )
 
 
-class MemberAlreadyExistsError(HTTPException):
+class MemberAlreadyExistsError(LibraryHTTPException):
     def __init__(self, name: str):
-        self.status_code = 400
-        self.detail = f"Member with the name '{name}' already exists!"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=400,
+            detail=f"Member with the name '{name}' already exists!"
+        )
 
 
-class InvalidMemberCredentialsError(HTTPException):
-    def __init__(self, name: str):
-        self.status_code = 401
-        self.detail = f"Invalid credentials for member '{name}'"
-        super().__init__(status_code=self.status_code, detail=self.detail)
 
-
-class MemberNotFoundError(HTTPException):
+class MemberNotFoundError(LibraryHTTPException):
     def __init__(self, member_id: str):
-        self.status_code = 400
-        self.detail = f"Member with ID '{member_id}' not found!"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=400,
+            detail=f"Member with ID '{member_id}' not found!"
+        )
 
 
-class BookUnavailableError(HTTPException):
+class BookUnavailableError(LibraryHTTPException):
     def __init__(self, title: str):
-        self.status_code = 404
-        self.detail = f"Book with title '{title}' is currently unavailable!"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=404,
+            detail=f"Book with title '{title}' is currently unavailable!"
+        )
 
 
-class BookNotFoundError(HTTPException):
+class BookNotFoundError(LibraryHTTPException):
     def __init__(self, title: str):
-        self.status_code = 404
-        self.detail = f"Book with title '{title}' not found!"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=404,
+            detail=f"Book with title '{title}' not found!"
+        )
 
 
-class AdminAccessDeniedError(HTTPException):
+class AdminAccessDeniedError(LibraryHTTPException):
     def __init__(self):
-        super().__init__(status_code=403, detail="Access denied")
+        super().__init__(
+            status_code=403,
+            detail="Access denied"
+        )
 
 
-class RaiseUnauthorizedError(HTTPException):
+class RaiseUnauthorizedError(LibraryHTTPException):
     def __init__(self):
-        self.status_code = 401
-        self.detail = f"User not authenticated"
-        super().__init__(status_code=self.status_code, detail=self.detail)
+        super().__init__(
+            status_code=401,
+            detail="User not authenticated"
+        )

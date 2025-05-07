@@ -3,6 +3,7 @@ from sqlalchemy import TIMESTAMP, Column, DateTime, Integer, String, ForeignKey,
 from sqlalchemy.orm import relationship
 from modules.infrastructure.database.base import Base
 
+
 class BorrowedBooks(Base):
     __tablename__ = "borrowed_books"
 
@@ -17,6 +18,7 @@ class BorrowedBooks(Base):
     member = relationship("Member", back_populates="borrowed_books")
     book = relationship("Book", back_populates="borrowed_books")
 
+
 class MemberLogins(Base):
     __tablename__ = "member_logins"
 
@@ -25,6 +27,7 @@ class MemberLogins(Base):
     member_id = Column(UUID(as_uuid=True), nullable=True)
     status = Column(String, nullable=False)
     login_time = Column(TIMESTAMP, nullable=True, default=datetime.utcnow)
+
 
 class ReturnBook(Base):
     __tablename__ = "return_book"

@@ -47,6 +47,7 @@ def add_member(
 
 from fastapi.encoders import jsonable_encoder
 
+
 @router.post("/add_books", dependencies=[Depends(JWTBearer())])
 def add_books(
     request: Request,
@@ -59,7 +60,6 @@ def add_books(
         return json_response(status_code=201, content=jsonable_encoder(result))
     except Exception as e:
         return json_response(status_code=400, content={"error": str(e)})
-
 
 
 @router.get("/view_available_books", dependencies=[Depends(JWTBearer())])
@@ -76,7 +76,11 @@ def view_books(
         return json_response(status_code=400, content={"error": str(e)})
 
 
-@router.get("/view_members", response_model=MembersListResponse, dependencies=[Depends(JWTBearer())])
+@router.get(
+    "/view_members",
+    response_model=MembersListResponse,
+    dependencies=[Depends(JWTBearer())],
+)
 def view_members(
     request: Request,
     db: Session = Depends(get_db_from_app),
@@ -89,7 +93,11 @@ def view_members(
         return json_response(status_code=400, content={"error": str(e)})
 
 
-@router.get("/view_members/{member_id}", response_model=MemberResponse, dependencies=[Depends(JWTBearer())])
+@router.get(
+    "/view_members/{member_id}",
+    response_model=MemberResponse,
+    dependencies=[Depends(JWTBearer())],
+)
 def view_members_by_id(
     member_id: str,
     request: Request,

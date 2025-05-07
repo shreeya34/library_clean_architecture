@@ -24,12 +24,15 @@ argon2-cffi==23.1.0
     # via library-clean-architecture
 argon2-cffi-bindings==21.2.0
     # via argon2-cffi
+black==25.1.0
+    # via library-clean-architecture
 certifi==2025.4.26
     # via httpcore
     # via httpx
 cffi==1.17.1
     # via argon2-cffi-bindings
 click==8.1.8
+    # via black
     # via rich-toolkit
     # via typer
     # via uvicorn
@@ -67,6 +70,14 @@ markupsafe==3.0.2
     # via mako
 mdurl==0.1.2
     # via markdown-it-py
+mypy-extensions==1.1.0
+    # via black
+packaging==25.0
+    # via black
+pathspec==0.12.1
+    # via black
+platformdirs==4.3.7
+    # via black
 psycopg2-binary==2.9.10
     # via library-clean-architecture
 pycparser==2.22

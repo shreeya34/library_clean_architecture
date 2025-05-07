@@ -4,7 +4,7 @@
 # from modules.domain.admin.models import AdminLogins
 # from modules.infrastructure.services.admin_services import get_admins
 # from modules.infrastructure.services.admin_services import view_available_books as core_view_books
-# from modules.infrastructure.config.settings import Settings  
+# from modules.infrastructure.config.settings import Settings
 # settings = Settings()
 
 
@@ -16,15 +16,15 @@
 #     admin_username: str = typer.Option(..., help="Admin username"),
 #     admin_password: str = typer.Option(..., help="Admin password"),
 #     title: str = typer.Option("", help="Search by book title (optional)"),
-#     status: str = typer.Option("active") 
+#     status: str = typer.Option("active")
 # ):
 #     admin_data = AdminLogins(username=admin_username, password=admin_password)
 #     admin_response = get_admins(admin_data, db)
-    
+
 #     user = {
 #         "username": admin_username,
 #         "admin_id": admin_response["admin_id"],
-#         "is_admin": True 
+#         "is_admin": True
 #     }
 
 #     result = core_view_books(title=title, db=db, user=user)

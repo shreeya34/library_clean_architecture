@@ -9,7 +9,6 @@ from modules.infrastructure.database.utils import commit_and_refresh
 from modules.domain.exceptions.admin.exception import (
     BookNotFoundError,
     BookUnavailableError,
-    InvalidMemberCredentialsError,
     MemberNotFoundError
 )
 from modules.domain.exceptions.admin.exception import RaiseUnauthorizedError
@@ -25,27 +24,27 @@ from modules.infrastructure.security.auth_handler import get_current_user, signJ
 from modules.infrastructure.logger import get_logger
 from modules.domain.member.response import BorrowedBookResponse
 from modules.infrastructure.repositories.admin_repositories import get_member_by_name
-from modules.domain.exceptions.member.exception import BookNotBorrowedError, DuplicateBookBorrowError
+from modules.domain.exceptions.member.exception import BookNotBorrowedError, DuplicateBookBorrowError, InvalidMemberCredentialsError
 from modules.infrastructure.repositories.member_repositories import create_member_login, get_book_by_title
 from modules.application.interfaces.member_services import MemberService
+from modules.infrastructure.security.password_utils import check_password
 
 logger = get_logger()
 postgres_manager = PostgresManager(settings)
 
 class LibraryMemberService(MemberService):
     def member_logins(self, member_login: MemberLoginRequest, db: Session) -> Dict[str, Any]:
-        """Implementation of member login"""
-        logger.info(f"Login for: {member_login.name}")
+        logger.info(f"Login attempt for: {member_login.name}")
 
         member = get_member_by_name(db, member_login.name)
-        if not member:
-            logger.warning("Failed login attempt for non-existent member: %s", member_login.name)
+        if not member or not check_password(member_login.password, member.password):
+            logger.warning("Invalid login credentials for: %s", member_login.name)
             raise InvalidMemberCredentialsError(member_login.name)
 
         access_token = signJWT(member.name, member.member_id, is_admin=False)
         logger.info(f"Login successful for user: {member_login.name}")
 
-        new_login = create_member_login(db, member.member_id, member_login.name)
+        create_member_login(db, member.member_id, member_login.name)
 
         return {
             "message": "Login successful",
@@ -64,7 +63,6 @@ class LibraryMemberService(MemberService):
         
         try:
             user_id = uuid.UUID(user_id_str)
-            # Convert UUID to string for querying the database
             user_id_str = str(user_id)
         except ValueError:
             logger.error("Invalid UUID format for user_id: %s", user_id_str)
@@ -80,10 +78,8 @@ class LibraryMemberService(MemberService):
             logger.warning("Borrow attempt for unavailable book: %s", book_title)
             raise BookUnavailableError(book_title)
         
-        # Convert book ID to integer if needed (it appears to be an integer in your model)
         book_id = book.id
         
-        # Ensure both IDs are strings for comparison with string columns
         member_id_str = member.member_id
         
         already_borrowed = db.query(BorrowedBooks).filter(
@@ -100,8 +96,8 @@ class LibraryMemberService(MemberService):
 
         borrowed_book = BorrowedBooks(
             title=book.title,
-            member_id=member_id_str,  # Use string version
-            book_id=book_id,          # Use integer version
+            member_id=member_id_str,  
+            book_id=book_id,        
             name=member.name,
             borrow_date=borrow_date.isoformat(),
             expiry_date=expiry_date.isoformat(),

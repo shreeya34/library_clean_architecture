@@ -16,7 +16,7 @@ def add_book(
 ):
     book_data = NewBooks(title=title, author=author, stock=stock)
     
-    mock_user = {"username": "admin", "is_admin": True}  # Simulated admin user
+    mock_user = {"username": "admin", "is_admin": True}  
 
     admin_service = AdminService()  # Create service instance
     admin_service.add_books(book_data, db, mock_user)  # Call method correctly

@@ -2,8 +2,17 @@ from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 from modules.application.interfaces.admin_services import AdminServiceInterface
 from modules.domain.admin.models import CreateModel, AdminLogins, NewMember, NewBooks
-from modules.domain.admin.response import BookResponseModel, MemberResponse, MembersListResponse
-from modules.infrastructure.database.models.admin import Admin, Book, BookAvailability, Member
+from modules.domain.admin.response import (
+    BookResponseModel,
+    MemberResponse,
+    MembersListResponse,
+)
+from modules.infrastructure.database.models.admin import (
+    Admin,
+    Book,
+    BookAvailability,
+    Member,
+)
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.repositories.admin_repositories import (
@@ -11,15 +20,26 @@ from modules.infrastructure.repositories.admin_repositories import (
     get_member_by_name,
     get_existing_book,
     get_member_by_id,
-    get_all_members
+    get_all_members,
 )
-from modules.infrastructure.security.password_utils import generate_random_password, hash_password, check_password
+from modules.infrastructure.security.password_utils import (
+    generate_random_password,
+    hash_password,
+    check_password,
+)
 from modules.infrastructure.logger import get_logger
 import uuid
-from modules.domain.exceptions.admin.exception import AdminAccessDeniedError, AdminAlreadyExistsError, InvalidAdminCredentialsError, MemberAlreadyExistsError, MemberNotFoundError
+from modules.domain.exceptions.admin.exception import (
+    AdminAccessDeniedError,
+    AdminAlreadyExistsError,
+    InvalidAdminCredentialsError,
+    MemberAlreadyExistsError,
+    MemberNotFoundError,
+)
 
 
 logger = get_logger()
+
 
 class AdminService(AdminServiceInterface):
 
@@ -36,7 +56,7 @@ class AdminService(AdminServiceInterface):
             admin_id=admin_id,
             username=admin.username,
             password=hashed_password,
-            role="admin"
+            role="admin",
         )
 
         commit_and_refresh(db, new_admin)
@@ -54,8 +74,12 @@ class AdminService(AdminServiceInterface):
         access_token = signJWT(admin.username, admin.admin_id, is_admin=True)
 
         logger.info(f"Admin {admin_data.username} logged in successfully.")
-        
-        return {"message": "Login successful", "token": access_token, "admin_id": admin.admin_id}
+
+        return {
+            "message": "Login successful",
+            "token": access_token,
+            "admin_id": admin.admin_id,
+        }
 
     def add_member(self, newuser: NewMember, db: Session, current_user: dict) -> dict:
         if not current_user.get("is_admin"):
@@ -70,12 +94,11 @@ class AdminService(AdminServiceInterface):
         plain_password = generate_random_password()
         hashed_password = hash_password(plain_password)
 
-
         new_member = Member(
             member_id=new_member_id,
             name=newuser.name,
             password=hashed_password,
-            role=newuser.role
+            role=newuser.role,
         )
 
         commit_and_refresh(db, new_member)
@@ -84,8 +107,11 @@ class AdminService(AdminServiceInterface):
 
         logger.info(f"New member {newuser.name} added successfully.")
 
-        return {"message": "Member added successfully", "new_member": new_member_response.dict()}
-
+        return {
+            "message": "Member added successfully",
+            "new_member": new_member_response.dict(),
+            "plain_password": plain_password,
+        }
 
     def add_books(self, newbook: NewBooks, db: Session, current_user: dict) -> dict:
         if not current_user.get("is_admin"):
@@ -99,14 +125,17 @@ class AdminService(AdminServiceInterface):
 
             existing_book_response = BookResponseModel.from_orm(existing_book)
 
-            return {"message": "Book updated successfully", "new_book": existing_book_response.dict()}
+            return {
+                "message": "Book updated successfully",
+                "new_book": existing_book_response.dict(),
+            }
 
         new_book = Book(
             title=newbook.title,
             author=newbook.author,
             stock=newbook.stock,
             available=True,
-            id=str(uuid.uuid4())
+            id=str(uuid.uuid4()),
         )
 
         commit_and_refresh(db, new_book)
@@ -115,8 +144,10 @@ class AdminService(AdminServiceInterface):
 
         logger.info(f"New book {newbook.title} added successfully.")
 
-        return {"message": "Book added successfully", "new_book": new_book_response.dict()}
-
+        return {
+            "message": "Book added successfully",
+            "new_book": new_book_response.dict(),
+        }
 
     def view_available_books(self, title: str, db: Session, current_user: dict) -> dict:
         if not current_user.get("is_admin"):
@@ -132,16 +163,28 @@ class AdminService(AdminServiceInterface):
 
         book_data = []
         for book in books:
-            availability_record = db.query(BookAvailability).filter(BookAvailability.book_id == book.id).first()
+            availability_record = (
+                db.query(BookAvailability)
+                .filter(BookAvailability.book_id == book.id)
+                .first()
+            )
             is_available = book.stock > 0
             if availability_record:
                 availability_record.available = is_available
             else:
-                new_availability = BookAvailability(book_id=book.id, title=book.title, available=is_available)
+                new_availability = BookAvailability(
+                    book_id=book.id, title=book.title, available=is_available
+                )
                 db.add(new_availability)
 
             if is_available:
-                book_data.append({"title": book.title, "author": book.author, "available": is_available})
+                book_data.append(
+                    {
+                        "title": book.title,
+                        "author": book.author,
+                        "available": is_available,
+                    }
+                )
 
         db.commit()
 
@@ -155,11 +198,16 @@ class AdminService(AdminServiceInterface):
         if not members:
             return {"message": "No members found"}
 
-        member_data = [{"name": member.name, "role": member.role, "member_id": member.member_id} for member in members]
+        member_data = [
+            {"name": member.name, "role": member.role, "member_id": member.member_id}
+            for member in members
+        ]
 
         return MembersListResponse(filtered_members=member_data)
 
-    def view_member_by_id(self, member_id: str, db: Session, current_user: dict) -> MemberResponse:
+    def view_member_by_id(
+        self, member_id: str, db: Session, current_user: dict
+    ) -> MemberResponse:
         if not current_user.get("is_admin"):
             raise AdminAccessDeniedError()
 

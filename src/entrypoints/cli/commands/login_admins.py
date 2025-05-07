@@ -3,7 +3,7 @@
 # from modules.infrastructure.database.postgres_manager import PostgresManager
 # from modules.domain.admin.models import AdminLogins
 # from modules.infrastructure.services.admin_services import get_admins as core_get_admins
-# from modules.infrastructure.config.settings import Settings  
+# from modules.infrastructure.config.settings import Settings
 # # Initialize settings
 # settings = Settings()
 

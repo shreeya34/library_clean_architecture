@@ -12,6 +12,7 @@ from modules.domain.member.response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
     BookAlreadyReturnedError,
     BookNotBorrowedError,
+    InvalidMemberCredentialsError,
     RaiseBookError,
     RaiseBorrowBookError,
 )
@@ -22,20 +23,25 @@ logger = get_logger()
 
 router = APIRouter()
 
+
 @router.post("/member/login")
 def member_login(
-    memberLogin: MemberLoginRequest,
-    db: Session = Depends(get_db_from_app)
+    memberLogin: MemberLoginRequest, db: Session = Depends(get_db_from_app)
 ):
     """
     Endpoint for member login
     """
-    login_result = member_service.member_logins(memberLogin, db)
-    return {
-        "message": "Login Success",
-        "member_id": login_result["member_id"],
-        "token": login_result["token"],
-    }
+    try:
+        login_result = member_service.member_logins(memberLogin, db)
+        return {
+            "message": "Login Success",
+            "member_id": login_result["member_id"],
+            "token": login_result["token"],
+        }
+    except InvalidMemberCredentialsError as e:
+        logger.error(f"Login failed for member: {memberLogin.name} with error: {e.detail}")
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
 
 @router.post(
     "/borrow", response_model=BorrowedBookResponse, dependencies=[Depends(JWTBearer())]
@@ -51,6 +57,7 @@ def borrow_book(
     else:
         raise RaiseBorrowBookError()
 
+
 @router.post("/return_book", dependencies=[Depends(JWTBearer())])
 def return_books(
     book_body: ReturnBookRequest,
@@ -64,17 +71,11 @@ def return_books(
                 "message": "Book returned successfully",
                 "returned_books": returned_books,
             }
-        
+
     except BookNotBorrowedError as e:
-            logger.warning(str(e))
-            raise HTTPException(
-                status_code=400,
-                detail=str(e)
-            )
+        logger.warning(str(e))
+        raise HTTPException(status_code=400, detail=str(e))
     except BookAlreadyReturnedError as e:
-            logger.warning(str(e))
-            raise HTTPException(
-                status_code=400,
-                detail=str(e)
-            )
-            raise RaiseBookError()
+        logger.warning(str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+        raise RaiseBookError()

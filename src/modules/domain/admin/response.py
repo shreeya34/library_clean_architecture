@@ -8,10 +8,10 @@ class MemberResponse(BaseModel):
     name: str
     role: str
     member_id: str
-    
+
     class Config:
         orm_mode = True
-        from_attributes = True 
+        from_attributes = True
 
 
 class MembersListResponse(BaseModel):
@@ -19,6 +19,7 @@ class MembersListResponse(BaseModel):
 
 
 from uuid import UUID
+
 
 class BookResponseModel(BaseModel):
     id: UUID
@@ -28,6 +29,5 @@ class BookResponseModel(BaseModel):
     available: bool
 
     class Config:
-        orm_mode = True  
-        from_attributes = True 
-
+        orm_mode = True
+        from_attributes = True

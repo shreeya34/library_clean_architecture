@@ -8,7 +8,6 @@ class BorrowedBookResponse(BaseModel):
     name: str
     borrow_date: datetime
     expiry_date: datetime
-    
 
 
 class BorrowBookSuccessResponse(BaseModel):
