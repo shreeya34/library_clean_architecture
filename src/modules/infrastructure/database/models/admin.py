@@ -64,7 +64,7 @@ class Member(Base):
     __tablename__ = "member"
 
     id = Column(Integer, primary_key=True, index=True)
-    member_id = Column(String, unique=True, nullable=False)
+    member_id = Column(String(36), unique=True, nullable=False)    
     name = Column(String, unique=True, nullable=False)
     role = Column(String, nullable=False)
     password = Column(String, nullable=False)

@@ -14,7 +14,6 @@ class MemberLoginInfo(BaseModel):
     name: str
     status: str
     login_time: datetime
-    member_id: UUID
     
     class Config:
         from_attributes = True 

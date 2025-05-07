@@ -15,6 +15,7 @@ dependencies = [
     "pydantic-settings>=2.9.1",
     "pyjwt>=2.10.1",
     "argon2-cffi>=23.1.0",
+    "alembic>=1.15.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
@@ -35,3 +36,8 @@ packages = ["src/library_clean_architecture"]
 
 [tool.rye.scripts]
 main = "fastapi dev server.py"
+
+
+[project.scripts]
+cli = "entrypoints.cli.commands.main:cli"
+

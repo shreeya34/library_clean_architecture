@@ -38,3 +38,7 @@ class BookNotBorrowedError(Exception):
         self.book_title = book_title
         self.message = f"The book '{self.book_title}' was not borrowed by the member."
         super().__init__(self.message)
+class BookAlreadyReturnedError(Exception):
+    def __init__(self, book_title: str):
+        self.book_title = book_title
+        super().__init__(f"Book '{book_title}' was already returned")

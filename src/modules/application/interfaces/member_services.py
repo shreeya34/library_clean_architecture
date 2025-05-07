@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
-from modules.domain.member.models import MemberLogins, BorrowBookRequest, ReturnBookRequest
+from modules.domain.member.models import MemberLoginRequest, BorrowBookRequest, ReturnBookRequest
 from modules.domain.member.response import BorrowedBookResponse
+from typing import Dict, Any
 
 class MemberService(ABC):
     @abstractmethod
-    def login_member(self, member_login: MemberLogins, db: Session) -> dict:
+    def member_logins(self, member_login: MemberLoginRequest, db: Session) -> Dict[str, Any]:
         pass
     
     @abstractmethod
@@ -13,5 +14,5 @@ class MemberService(ABC):
         pass
     
     @abstractmethod
-    def return_book(self, return_request: ReturnBookRequest, db: Session, current_user: dict) -> dict:
+    def return_book(self, return_request: ReturnBookRequest, db: Session, current_user: dict) -> Dict[str, Any]:
         pass

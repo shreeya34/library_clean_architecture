@@ -8,7 +8,7 @@ class BorrowedBooks(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    member_id = Column(UUID(as_uuid=True), ForeignKey("member.member_id"), nullable=False)
+    member_id = Column(String, ForeignKey("member.member_id"), nullable=False)
     book_id = Column(UUID(as_uuid=True), ForeignKey("book.id"), nullable=False)
     name = Column(String, nullable=False)
     borrow_date = Column(TIMESTAMP, default=datetime.utcnow)

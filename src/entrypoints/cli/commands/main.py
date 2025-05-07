@@ -1,29 +1,17 @@
-import typer
-from entrypoints.cli.commands import (
-    add_admin,
-    add_members,
-    create_tables,
-    list_members,
-    login_admins,
-    add_book,
-    list_books,
-    
-)
-from entrypoints.cli.commands import login_members
-# from entrypoints.cli.commands.login_members import member_login
 
-app = typer.Typer()
+import click
+from .add_admin import add_admin
+from .add_book import add_book
+from .create_tables import create_tables
 
-app.command()(add_admin.add_admin)
-# app.command()(login_admins.login_admin)
-app.command()(add_book.add_book)
-# app.command()(list_books.view_books)
-# app.command()(list_members.view_members)
-# app.command()(add_members.add_member)
-# app.command("member-login")(login_members.member_login)  
-app.command()(create_tables.create_tables)
+@click.group()
+def cli():
+    """Library Management System CLI"""
+    pass
 
-
+cli.add_command(add_admin, name="add-admin")
+cli.add_command(add_book, name="add-book")
+cli.add_command(create_tables, name="create-tables")
 
 if __name__ == "__main__":
-    app()
+    cli()

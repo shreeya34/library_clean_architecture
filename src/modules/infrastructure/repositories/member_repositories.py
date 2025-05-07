@@ -13,10 +13,7 @@ def get_member_by_name(db: Session, name: str) -> Member:
 
 
 def create_member_login(db: Session, member_id: UUID, name: str) -> MemberLoginsDB:
-    """
-    Create a new login record for a member
-    Uses the SQLAlchemy MemberLogins model, not the Pydantic model
-    """
+   
     new_login = MemberLoginsDB(
         name=name,
         status="success",

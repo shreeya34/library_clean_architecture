@@ -10,6 +10,8 @@
 #   universal: false
 
 -e file:.
+alembic==1.15.2
+    # via library-clean-architecture
 annotated-types==0.7.0
     # via pydantic
 anyio==4.9.0
@@ -56,10 +58,13 @@ idna==3.10
     # via httpx
 jinja2==3.1.6
     # via fastapi
+mako==1.3.10
+    # via alembic
 markdown-it-py==3.0.0
     # via rich
 markupsafe==3.0.2
     # via jinja2
+    # via mako
 mdurl==0.1.2
     # via markdown-it-py
 psycopg2-binary==2.9.10
@@ -95,12 +100,14 @@ shellingham==1.5.4
 sniffio==1.3.1
     # via anyio
 sqlalchemy==2.0.40
+    # via alembic
     # via library-clean-architecture
 starlette==0.46.2
     # via fastapi
 typer==0.15.3
     # via fastapi-cli
 typing-extensions==4.13.2
+    # via alembic
     # via anyio
     # via fastapi
     # via pydantic
