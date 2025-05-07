@@ -38,7 +38,7 @@ packages = ["src/library_clean_architecture"]
 [tool.rye.scripts]
 main = "fastapi dev server.py"
 
-
 [project.scripts]
-cli = "entrypoints.cli.commands.main:cli"
+cli = "cmd_app.cli.commands.main:cli"
+
 

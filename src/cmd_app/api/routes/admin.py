@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 from modules.infrastructure.database.dependency import get_db_from_app
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
-from modules.domain.admin.models import CreateModel, AdminLogins, NewMember, NewBooks
+from modules.application.models.request.admin_request import CreateModel, AdminLogins, NewMember, NewBooks
 from entrypoints.api.utils.response_utils import json_response
 from modules.infrastructure.services.admin_services import AdminService
-from modules.domain.admin.response import MemberResponse, MembersListResponse
+from modules.application.models.response.admin_response import MemberResponse, MembersListResponse
 from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()

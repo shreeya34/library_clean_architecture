@@ -14,7 +14,7 @@ from modules.domain.exceptions.admin.exception import (
 from modules.domain.exceptions.admin.exception import RaiseUnauthorizedError
 from modules.infrastructure.database.models.member import BorrowedBooks, ReturnBook
 from modules.infrastructure.database.models.admin import Member
-from modules.domain.member.models import (
+from modules.application.models.request.member_request import (
     BorrowBookRequest,
     MemberLoginRequest,
     ReturnBookRequest,
@@ -22,7 +22,7 @@ from modules.domain.member.models import (
 from modules.infrastructure.database.postgres_manager import PostgresManager
 from modules.infrastructure.security.auth_handler import get_current_user, signJWT
 from modules.infrastructure.logger import get_logger
-from modules.domain.member.response import BorrowedBookResponse
+from modules.application.models.response.member_response import BorrowedBookResponse
 from modules.infrastructure.repositories.admin_repositories import get_member_by_name
 from modules.domain.exceptions.member.exception import (
     BookNotBorrowedError,

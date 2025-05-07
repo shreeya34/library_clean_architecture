@@ -3,15 +3,16 @@ from sqlalchemy.orm import Session
 from modules.infrastructure.database.dependency import get_db_from_app
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
-from modules.domain.member.models import (
+from modules.application.models.request.member_request import (
     MemberLoginRequest,
     BorrowBookRequest,
     ReturnBookRequest,
 )
-from modules.domain.member.response import BorrowedBookResponse
+from modules.application.models.response.member_response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
     BookAlreadyReturnedError,
     BookNotBorrowedError,
+    DuplicateBookBorrowError,
     InvalidMemberCredentialsError,
     RaiseBookError,
     RaiseBorrowBookError,
@@ -53,11 +54,14 @@ def borrow_book(
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
 ):
-    borrowed_books = member_service.borrow_book(book_body, db, user)
-    if borrowed_books:
-        return borrowed_books
-    else:
-        raise RaiseBorrowBookError()
+    try:
+        borrowed_books = member_service.borrow_book(book_body, db, user)
+        if borrowed_books:
+            return borrowed_books
+        else:
+            raise RaiseBorrowBookError()
+    except DuplicateBookBorrowError as e:
+        raise HTTPException(status_code=409, detail=str(e))
 
 
 @router.post("/return_book", dependencies=[Depends(JWTBearer())])

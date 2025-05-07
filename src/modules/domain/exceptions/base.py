@@ -1,8 +1,7 @@
-from abc import ABC, abstractmethod
-from fastapi import HTTPException
+from abc import ABC
 
 
-class LibraryHTTPException(Exception):
+class LibraryHTTPException(Exception, ABC):
     def __init__(self, status_code: int, detail: str):
         self.status_code = status_code
         self.detail = detail

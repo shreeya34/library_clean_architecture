@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
 from modules.application.interfaces.admin_services import AdminServiceInterface
-from modules.domain.admin.models import CreateModel, AdminLogins, NewMember, NewBooks
-from modules.domain.admin.response import (
+from modules.application.models.request.admin_request import CreateModel, AdminLogins, NewMember, NewBooks
+from modules.application.models.response.admin_response import (
     BookResponseModel,
     MemberResponse,
     MembersListResponse,
