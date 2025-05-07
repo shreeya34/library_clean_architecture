@@ -15,13 +15,15 @@ from modules.infrastructure.database.models.admin import (
 )
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.database.utils import commit_and_refresh
-from modules.infrastructure.repositories.admin_repositories import (
-    get_admin_by_username,
-    get_member_by_name,
-    get_existing_book,
-    get_member_by_id,
-    get_all_members,
-)
+# from modules.infrastructure.repositories.admin.admin_repositories import (
+#     get_admin_by_username,
+#     get_member_by_name,
+#     get_existing_book,
+#     get_member_by_id,
+#     get_all_members,
+# )
+from modules.infrastructure.repositories.admin.admin_repositories_impl import AdminRepository
+
 from modules.infrastructure.security.password_utils import (
     generate_random_password,
     hash_password,
@@ -42,9 +44,18 @@ logger = get_logger()
 
 
 class AdminService(AdminServiceInterface):
+    
+    def __init__(self):
+        self.admin_repo = AdminRepository()
+    
+    def _check_admin(self, current_user: dict):
+        """Ensure the current user has admin privileges."""
+        if not current_user.get("is_admin"):
+            raise AdminAccessDeniedError()
+
 
     def create_admin(self, admin: CreateModel, db: Session) -> dict:
-        existing_admin = get_admin_by_username(db, admin.username)
+        existing_admin = self.admin_repo.get_admin_by_username(db, admin.username)
         if existing_admin:
             logger.warning(f"Admin {admin.username} already exists.")
             raise AdminAlreadyExistsError(admin.username)
@@ -66,7 +77,7 @@ class AdminService(AdminServiceInterface):
         return {"admin_id": new_admin.admin_id, "username": new_admin.username}
 
     def login_admin(self, admin_data: AdminLogins, db: Session) -> dict:
-        admin = get_admin_by_username(db, admin_data.username)
+        admin = self.admin_repo.get_admin_by_username(db, admin_data.username)
         if not admin or not check_password(admin_data.password, admin.password):
             logger.warning(f"Failed login attempt for admin {admin_data.username}")
             raise InvalidAdminCredentialsError(admin_data.username)
@@ -82,10 +93,10 @@ class AdminService(AdminServiceInterface):
         }
 
     def add_member(self, newuser: NewMember, db: Session, current_user: dict) -> dict:
-        if not current_user.get("is_admin"):
-            raise AdminAccessDeniedError()
+        self._check_admin(current_user)
 
-        existing_member = get_member_by_name(db, newuser.name)
+
+        existing_member = self.admin_repo.get_member_by_name(db, newuser.name)
         if existing_member:
             logger.warning(f"Member {newuser.name} already exists.")
             raise MemberAlreadyExistsError(newuser.name)
@@ -114,10 +125,10 @@ class AdminService(AdminServiceInterface):
         }
 
     def add_books(self, newbook: NewBooks, db: Session, current_user: dict) -> dict:
-        if not current_user.get("is_admin"):
-            raise AdminAccessDeniedError()
+        self._check_admin(current_user)
 
-        existing_book = get_existing_book(db, newbook)
+
+        existing_book = self.admin_repo.get_existing_book(db, newbook)
         if existing_book:
             existing_book.stock += newbook.stock
             existing_book.available = existing_book.stock > 0
@@ -150,8 +161,8 @@ class AdminService(AdminServiceInterface):
         }
 
     def view_available_books(self, title: str, db: Session, current_user: dict) -> dict:
-        if not current_user.get("is_admin"):
-            raise AdminAccessDeniedError()
+        self._check_admin(current_user)
+
 
         if title:
             books = db.query(Book).filter(Book.title.ilike(f"%{title}%")).all()
@@ -191,10 +202,9 @@ class AdminService(AdminServiceInterface):
         return {"message": "Books available", "books": book_data}
 
     def view_all_members(self, db: Session, current_user: dict) -> MembersListResponse:
-        if not current_user.get("is_admin"):
-            raise AdminAccessDeniedError()
+        self._check_admin(current_user)
 
-        members = get_all_members(db)
+        members = self.admin_repo.get_all_members(db)
         if not members:
             return {"message": "No members found"}
 
@@ -208,10 +218,10 @@ class AdminService(AdminServiceInterface):
     def view_member_by_id(
         self, member_id: str, db: Session, current_user: dict
     ) -> MemberResponse:
-        if not current_user.get("is_admin"):
-            raise AdminAccessDeniedError()
+        self._check_admin(current_user)
 
-        member = get_member_by_id(db, member_id)
+
+        member = self.admin_repo.get_member_by_id(db, member_id)
         if not member:
             raise MemberNotFoundError(member_id)
 

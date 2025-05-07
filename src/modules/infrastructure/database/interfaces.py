@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import sessionmaker, Session
 
-# from sqlalchemy.ext.declarative import declarative_base
 
-# Base = declarative_base()
 
 
 class DatabaseManager(ABC):

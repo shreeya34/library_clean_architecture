@@ -20,19 +20,18 @@ from modules.application.models.request.member_request import (
     ReturnBookRequest,
 )
 from modules.infrastructure.database.postgres_manager import PostgresManager
+from modules.infrastructure.repositories.admin.admin_repositories_impl import AdminRepository
 from modules.infrastructure.security.auth_handler import get_current_user, signJWT
 from modules.infrastructure.logger import get_logger
 from modules.application.models.response.member_response import BorrowedBookResponse
-from modules.infrastructure.repositories.admin_repositories import get_member_by_name
+from modules.infrastructure.repositories.admin.admin_repositories import get_member_by_name
 from modules.domain.exceptions.member.exception import (
     BookNotBorrowedError,
     DuplicateBookBorrowError,
     InvalidMemberCredentialsError,
 )
-from modules.infrastructure.repositories.member_repositories import (
-    create_member_login,
-    get_book_by_title,
-)
+from modules.infrastructure.repositories.member.member_repository_impl import MemberRepository
+
 from modules.application.interfaces.member_services import MemberService
 from modules.infrastructure.security.password_utils import check_password
 
@@ -41,6 +40,9 @@ postgres_manager = PostgresManager(settings)
 
 
 class LibraryMemberService(MemberService):
+    def __init__(self):
+        self.member_repo = MemberRepository()
+        
     def member_logins(
         self, member_login: MemberLoginRequest, db: Session
     ) -> Dict[str, Any]:
@@ -54,7 +56,7 @@ class LibraryMemberService(MemberService):
         access_token = signJWT(member.name, member.member_id, is_admin=False)
         logger.info(f"Login successful for user: {member_login.name}")
 
-        create_member_login(db, member.member_id, member_login.name)
+        self.member_repo.create_member_login(db, member.member_id, member_login.name)
 
         return {
             "message": "Login successful",
@@ -85,7 +87,7 @@ class LibraryMemberService(MemberService):
             logger.error("Borrow attempt by non-existent member: %s", user_id_str)
             raise MemberNotFoundError(user_id_str)
 
-        book = get_book_by_title(db, book_title)
+        book = self.member_repo.get_book_by_title(db, book_title)
         if not book or book.stock <= 0:
             logger.warning("Borrow attempt for unavailable book: %s", book_title)
             raise BookUnavailableError(book_title)
@@ -149,7 +151,7 @@ class LibraryMemberService(MemberService):
             logger.error("Return attempt by non-existent member: %s", user_id)
             raise MemberNotFoundError(user_id)
 
-        book = get_book_by_title(db, book_title)
+        book = self.member_repo.get_book_by_title(db, book_title)
         if not book:
             logger.warning("Return attempt for non-existent book: %s", book_title)
             raise BookNotFoundError(book_title)
