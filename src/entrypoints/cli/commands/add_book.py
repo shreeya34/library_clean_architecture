@@ -1,24 +1,35 @@
-import typer
+import click
 from sqlalchemy.orm import Session
+from entrypoints.cli.commands.db_utils import get_db
 from modules.infrastructure.database.postgres_manager import PostgresManager
 from modules.domain.admin.models import NewBooks
 from modules.infrastructure.services.admin_services import AdminService  # FIXED import
-from modules.infrastructure.config.settings import Settings  
+from modules.infrastructure.config.settings import Settings
 
-settings = Settings()
-postgres_manager = PostgresManager(settings=settings)
-db: Session = next(postgres_manager.get_db())
 
-def add_book(
-    title: str = typer.Option(..., help="Book title"),
-    author: str = typer.Option(..., help="Book author"),
-    stock: int = typer.Option(..., help="Number of copies available")
-):
+@click.command()
+@click.option("--title", prompt="Book title", help="Book title")
+@click.option("--author", prompt="Book author", help="Book author")
+@click.option(
+    "--stock",
+    prompt="Number of copies available",
+    type=int,
+    help="Number of copies available",
+)
+def add_book(title: str, author: str, stock: int):
+    """
+    Add a new book to the system.
+    """
+
+    db = get_db()
     book_data = NewBooks(title=title, author=author, stock=stock)
-    
-    mock_user = {"username": "admin", "is_admin": True}  
 
-    admin_service = AdminService()  # Create service instance
-    admin_service.add_books(book_data, db, mock_user)  # Call method correctly
+    mock_user = {"username": "admin", "is_admin": True}
+    admin_service = AdminService()
+    admin_service.add_books(book_data, db, mock_user)
 
-    typer.echo(f"Book '{title}' by {author} added successfully with {stock} in stock.")
+    click.echo(f"Book '{title}' by {author} added successfully with {stock} in stock.")
+
+
+if __name__ == "__main__":
+    add_book()

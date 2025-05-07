@@ -1,15 +1,10 @@
 import click
 from sqlalchemy.orm import Session
+from entrypoints.cli.commands.db_utils import get_db
 from modules.infrastructure.database.postgres_manager import PostgresManager
 from modules.domain.admin.models import CreateModel
 from modules.infrastructure.services.admin_services import AdminService
 from modules.infrastructure.config.settings import Settings
-
-
-def get_db():
-    settings = Settings()
-    postgres_manager = PostgresManager(settings=settings)
-    return next(postgres_manager.get_db())
 
 
 @click.command()

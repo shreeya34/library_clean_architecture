@@ -8,6 +8,7 @@ from modules.domain.admin.models import CreateModel, AdminLogins, NewMember, New
 from entrypoints.api.utils.response_utils import json_response
 from modules.infrastructure.services.admin_services import AdminService
 from modules.domain.admin.response import MemberResponse, MembersListResponse
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 admin_service = AdminService()
@@ -43,9 +44,6 @@ def add_member(
         return json_response(status_code=201, content=result)
     except Exception as e:
         return json_response(status_code=400, content={"error": str(e)})
-
-
-from fastapi.encoders import jsonable_encoder
 
 
 @router.post("/add_books", dependencies=[Depends(JWTBearer())])

@@ -39,7 +39,9 @@ def member_login(
             "token": login_result["token"],
         }
     except InvalidMemberCredentialsError as e:
-        logger.error(f"Login failed for member: {memberLogin.name} with error: {e.detail}")
+        logger.error(
+            f"Login failed for member: {memberLogin.name} with error: {e.detail}"
+        )
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 
