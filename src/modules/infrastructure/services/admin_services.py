@@ -15,13 +15,6 @@ from modules.infrastructure.database.models.admin import (
 )
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.database.utils import commit_and_refresh
-# from modules.infrastructure.repositories.admin.admin_repositories import (
-#     get_admin_by_username,
-#     get_member_by_name,
-#     get_existing_book,
-#     get_member_by_id,
-#     get_all_members,
-# )
 from modules.infrastructure.repositories.admin.admin_repositories_impl import AdminRepository
 
 from modules.infrastructure.security.password_utils import (
@@ -49,7 +42,6 @@ class AdminService(AdminServiceInterface):
         self.admin_repo = AdminRepository()
     
     def _check_admin(self, current_user: dict):
-        """Ensure the current user has admin privileges."""
         if not current_user.get("is_admin"):
             raise AdminAccessDeniedError()
 

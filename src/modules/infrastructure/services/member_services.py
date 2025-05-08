@@ -20,11 +20,10 @@ from modules.application.models.request.member_request import (
     ReturnBookRequest,
 )
 from modules.infrastructure.database.postgres_manager import PostgresManager
-from modules.infrastructure.repositories.admin.admin_repositories_impl import AdminRepository
 from modules.infrastructure.security.auth_handler import get_current_user, signJWT
 from modules.infrastructure.logger import get_logger
 from modules.application.models.response.member_response import BorrowedBookResponse
-from modules.infrastructure.repositories.admin.admin_repositories import get_member_by_name
+from modules.infrastructure.repositories.member.member_repository_impl import MemberRepository
 from modules.domain.exceptions.member.exception import (
     BookNotBorrowedError,
     DuplicateBookBorrowError,
@@ -48,7 +47,7 @@ class LibraryMemberService(MemberService):
     ) -> Dict[str, Any]:
         logger.info(f"Login attempt for: {member_login.name}")
 
-        member = get_member_by_name(db, member_login.name)
+        member = self.member_repo.get_member_by_name(db, member_login.name)
         if not member or not check_password(member_login.password, member.password):
             logger.warning("Invalid login credentials for: %s", member_login.name)
             raise InvalidMemberCredentialsError(member_login.name)

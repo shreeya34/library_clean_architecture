@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.models.admin import Admin, Book, BookAvailability, Member, ViewMembers
-from modules.infrastructure.repositories.admin.admin_repositories_impl import IAdminRepository
+from modules.infrastructure.repositories.admin.admin_repositories import IAdminRepository
 
 class AdminRepository(IAdminRepository):
     def get_admin_by_username(self, db: Session, username: str) -> Admin:
