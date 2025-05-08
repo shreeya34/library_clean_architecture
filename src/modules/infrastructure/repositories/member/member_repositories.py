@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.models.admin import Book, Member
 
+
 class IMemberRepository(ABC):
     @abstractmethod
     def get_member_by_name(self, db: Session, name: str) -> Member:

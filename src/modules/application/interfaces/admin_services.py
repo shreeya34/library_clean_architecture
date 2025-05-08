@@ -1,7 +1,15 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
-from modules.application.models.request.admin_request import CreateModel, AdminLogins, NewMember, NewBooks
-from modules.application.models.response.admin_response import MemberResponse, MembersListResponse
+from modules.application.models.request.admin_request import (
+    CreateModel,
+    AdminLogins,
+    NewMember,
+    NewBooks,
+)
+from modules.application.models.response.admin_response import (
+    MemberResponse,
+    MembersListResponse,
+)
 
 
 class AdminServiceInterface(ABC):

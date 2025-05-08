@@ -1,6 +1,13 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
-from modules.infrastructure.database.models.admin import Admin, Book, BookAvailability, Member, ViewMembers
+from modules.infrastructure.database.models.admin import (
+    Admin,
+    Book,
+    BookAvailability,
+    Member,
+    ViewMembers,
+)
+
 
 class IAdminRepository(ABC):
     @abstractmethod
@@ -28,7 +35,9 @@ class IAdminRepository(ABC):
         pass
 
     @abstractmethod
-    def get_book_availability_by_book_id(self, db: Session, book_id: int) -> BookAvailability:
+    def get_book_availability_by_book_id(
+        self, db: Session, book_id: int
+    ) -> BookAvailability:
         pass
 
     @abstractmethod

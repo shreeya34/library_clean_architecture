@@ -2,8 +2,6 @@ from abc import ABC, abstractmethod
 from sqlalchemy.orm import sessionmaker, Session
 
 
-
-
 class DatabaseManager(ABC):
     @abstractmethod
     def get_engine(self):

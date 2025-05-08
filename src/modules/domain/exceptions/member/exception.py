@@ -6,17 +6,9 @@ class AdminAccessDeniedError(LibraryHTTPException):
         super().__init__(status_code=403, detail="Access denied")
 
 
-class InvalidMemberCredentialsError(LibraryHTTPException):
-    def __init__(self, name: str):
-        super().__init__(
-            status_code=401, detail=f"Invalid credentials for member '{name}'"
-        )
-
-
 class RaiseUnauthorizedError(LibraryHTTPException):
-    def __init__(self):
-
-        super().__init__(status_code=401, detail="User not authenticated")
+    def __init__(self, detail: str = "User not authenticated"):
+        super().__init__(status_code=401, detail=detail)
 
 
 class RaiseBookError(LibraryHTTPException):
@@ -50,3 +42,25 @@ class BookAlreadyReturnedError(LibraryHTTPException):
         super().__init__(
             status_code=400, detail=f"Book '{book_title}' was already returned"
         )
+
+
+class InvalidMemberCredentialsError(LibraryHTTPException):
+    def __init__(self, name: str):
+        super().__init__(
+            status_code=401, detail=f"Invalid credentials for member '{name}'"
+        )
+
+
+class OnlyMembersCanBorrowError(LibraryHTTPException):
+    def __init__(self, detail: str = "Only members can borrow books"):
+        super().__init__(status_code=403, detail=detail)
+
+
+class InvalidUUIDError(LibraryHTTPException):
+    def __init__(self, detail: str = "Invalid UUID format for user_id"):
+        super().__init__(status_code=400, detail=detail)
+
+
+class OnlyMembersReturnBorrowError(LibraryHTTPException):
+    def __init__(self, detail: str = "Only members can return books"):
+        super().__init__(status_code=403, detail=detail)

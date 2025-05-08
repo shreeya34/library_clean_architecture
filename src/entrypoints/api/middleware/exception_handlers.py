@@ -2,6 +2,7 @@ from fastapi import Request, HTTPException
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+from modules.domain.exceptions.member.exception import RaiseUnauthorizedError
 from modules.infrastructure.logger import logger
 
 
@@ -16,6 +17,12 @@ class ExceptionHandlerMiddleware(BaseHTTPMiddleware):
             return JSONResponse(
                 status_code=422,
                 content={"detail": val_err.errors()},
+            )
+        except RaiseUnauthorizedError as auth_err:
+            logger.warning(f"Unauthorized Access: {str(auth_err)}")
+            return JSONResponse(
+                status_code=401,
+                content={"detail": str(auth_err)},
             )
 
         except Exception as exc:
