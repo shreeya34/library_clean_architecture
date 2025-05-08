@@ -7,8 +7,6 @@ from modules.infrastructure.database.models import *
 from modules.infrastructure.config.settings import Settings
 
 
-
-
 class PostgresManager(DatabaseManager):
     def __init__(self, settings: Settings):
         self.settings = settings
