@@ -39,6 +39,6 @@ packages = ["src/library_clean_architecture"]
 main = "fastapi dev server.py"
 
 [project.scripts]
-cli = "cmd_app.cli.commands.main:cli"
+cli = "entrypoints.cli.main:cli"
 
 

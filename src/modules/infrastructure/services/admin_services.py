@@ -20,11 +20,10 @@ from modules.infrastructure.database.models.admin import (
     BookAvailability,
     Member,
 )
+from modules.domain.repositories.admin.admin_repositories import IAdminRepository
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.database.utils import commit_and_refresh
-from modules.infrastructure.repositories.admin.admin_repositories_impl import (
-    AdminRepository,
-)
+
 
 from modules.infrastructure.security.password_utils import (
     generate_random_password,
@@ -47,8 +46,8 @@ logger = get_logger()
 
 class AdminService(AdminServiceInterface):
 
-    def __init__(self):
-        self.admin_repo = AdminRepository()
+    def __init__(self, admin_repo: IAdminRepository):
+        self.admin_repo = admin_repo
 
     def _check_admin(self, current_user: dict):
         if not current_user.get("is_admin"):

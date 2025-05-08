@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.dependency import get_db_from_app
+from modules.infrastructure.dependencies.member_dependencies import get_member_service
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
 from modules.application.models.request.member_request import (
@@ -17,8 +18,8 @@ from modules.domain.exceptions.member.exception import (
     RaiseBookError,
     RaiseBorrowBookError,
 )
-from modules.infrastructure.services.member_services import member_service
 from modules.infrastructure.logger import get_logger
+from modules.infrastructure.services.member_services import LibraryMemberService
 
 logger = get_logger()
 
@@ -27,7 +28,10 @@ router = APIRouter()
 
 @router.post("/member/login")
 def member_login(
-    memberLogin: MemberLoginRequest, db: Session = Depends(get_db_from_app)
+    memberLogin: MemberLoginRequest, 
+    db: Session = Depends(get_db_from_app),
+    member_service: LibraryMemberService = Depends(get_member_service),
+
 ):
     """
     Endpoint for member login
@@ -53,6 +57,8 @@ def borrow_book(
     book_body: BorrowBookRequest,
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    member_service: LibraryMemberService = Depends(get_member_service),
+
 ):
     try:
         borrowed_books = member_service.borrow_book(book_body, db, user)
@@ -69,6 +75,8 @@ def return_books(
     book_body: ReturnBookRequest,
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    member_service: LibraryMemberService = Depends(get_member_service),
+
 ):
     try:
         returned_books = member_service.return_book(book_body, db, user)

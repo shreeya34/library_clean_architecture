@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Dict, Any
-from uuid import UUID
 import uuid
-from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from modules.infrastructure.config import settings
+from modules.domain.repositories.member.member_repositories import IMemberRepository
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.domain.exceptions.admin.exception import (
     BookNotFoundError,
@@ -24,32 +22,26 @@ from modules.application.models.request.member_request import (
     MemberLoginRequest,
     ReturnBookRequest,
 )
-from modules.infrastructure.database.postgres_manager import PostgresManager
-from modules.infrastructure.security.auth_handler import get_current_user, signJWT
+from modules.infrastructure.security.auth_handler import  signJWT
 from modules.infrastructure.logger import get_logger
 from modules.application.models.response.member_response import BorrowedBookResponse
-from modules.infrastructure.repositories.member.member_repository_impl import (
-    MemberRepository,
-)
 from modules.domain.exceptions.member.exception import (
     BookNotBorrowedError,
     DuplicateBookBorrowError,
     InvalidMemberCredentialsError,
 )
-from modules.infrastructure.repositories.member.member_repository_impl import (
-    MemberRepository,
-)
+
 
 from modules.application.interfaces.member_services import MemberService
 from modules.infrastructure.security.password_utils import check_password
 
 logger = get_logger()
-postgres_manager = PostgresManager(settings)
 
 
 class LibraryMemberService(MemberService):
-    def __init__(self):
-        self.member_repo = MemberRepository()
+
+    def __init__(self, member_repo: IMemberRepository):
+        self.member_repo = member_repo
 
     def member_logins(
         self, member_login: MemberLoginRequest, db: Session
@@ -225,4 +217,3 @@ class LibraryMemberService(MemberService):
             raise
 
 
-member_service = LibraryMemberService()

@@ -6,7 +6,7 @@ from modules.infrastructure.database.models.admin import (
     Member,
     ViewMembers,
 )
-from modules.infrastructure.repositories.admin.admin_repositories import (
+from modules.domain.repositories.admin.admin_repositories import (
     IAdminRepository,
 )
 

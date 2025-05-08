@@ -1,4 +1,4 @@
-from modules.infrastructure.repositories.member.member_repositories import (
+from modules.domain.repositories.member.member_repositories import (
     IMemberRepository,
 )
 from datetime import datetime, timedelta

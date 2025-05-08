@@ -2,6 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.dependency import get_db_from_app
+from modules.infrastructure.dependencies.admin_dependencies import get_admin_service
+from modules.infrastructure.repositories.admin.admin_repositories_impl import (
+    AdminRepository,
+)
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
 from modules.application.models.request.admin_request import (
@@ -19,11 +23,14 @@ from modules.application.models.response.admin_response import (
 from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
-admin_service = AdminService()
 
 
 @router.post("/")
-def create_admin(admin: CreateModel, db: Session = Depends(get_db_from_app)):
+def create_admin(
+    admin: CreateModel,
+    db: Session = Depends(get_db_from_app),
+    admin_service: AdminService = Depends(get_admin_service),
+):
     try:
         result = admin_service.create_admin(admin, db)
         return json_response(status_code=201, content=result)
@@ -32,7 +39,11 @@ def create_admin(admin: CreateModel, db: Session = Depends(get_db_from_app)):
 
 
 @router.post("/login")
-def login_admin(admin_data: AdminLogins, db: Session = Depends(get_db_from_app)):
+def login_admin(
+    admin_data: AdminLogins,
+    db: Session = Depends(get_db_from_app),
+    admin_service: AdminService = Depends(get_admin_service),
+):
     try:
         login_result = admin_service.login_admin(admin_data, db)
         return JSONResponse(content=login_result)
@@ -46,6 +57,7 @@ def add_member(
     newuser: NewMember,
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service),
 ):
     try:
         result = admin_service.add_member(newuser, db, user)
@@ -60,6 +72,7 @@ def add_books(
     newbook: NewBooks,
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service),
 ):
     try:
         result = admin_service.add_books(newbook, db, user)
@@ -74,6 +87,7 @@ def view_books(
     title: str = Query(None),
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service),
 ):
     try:
         result = admin_service.view_available_books(title, db, user)
@@ -91,6 +105,7 @@ def view_members(
     request: Request,
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service),
 ):
     try:
         result = admin_service.view_all_members(db, user)
@@ -109,6 +124,7 @@ def view_members_by_id(
     request: Request,
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
+    admin_service: AdminService = Depends(get_admin_service),
 ):
     try:
         result = admin_service.view_member_by_id(member_id, db, user)
