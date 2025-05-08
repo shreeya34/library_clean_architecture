@@ -1,5 +1,4 @@
 from fastapi import Depends
-
 from modules.infrastructure.repositories.member.member_repository_impl import (
     MemberRepository,
 )

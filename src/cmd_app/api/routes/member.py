@@ -28,10 +28,9 @@ router = APIRouter()
 
 @router.post("/member/login")
 def member_login(
-    memberLogin: MemberLoginRequest, 
+    memberLogin: MemberLoginRequest,
     db: Session = Depends(get_db_from_app),
     member_service: LibraryMemberService = Depends(get_member_service),
-
 ):
     """
     Endpoint for member login
@@ -58,7 +57,6 @@ def borrow_book(
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
     member_service: LibraryMemberService = Depends(get_member_service),
-
 ):
     try:
         borrowed_books = member_service.borrow_book(book_body, db, user)
@@ -76,7 +74,6 @@ def return_books(
     db: Session = Depends(get_db_from_app),
     user: dict = Depends(get_current_user),
     member_service: LibraryMemberService = Depends(get_member_service),
-
 ):
     try:
         returned_books = member_service.return_book(book_body, db, user)

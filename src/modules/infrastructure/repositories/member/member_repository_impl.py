@@ -1,10 +1,7 @@
 from modules.domain.repositories.member.member_repositories import (
     IMemberRepository,
 )
-from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
-from uuid import UUID
-
+from datetime import datetime
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.database.models.admin import Book, Member
 from modules.infrastructure.database.models.member import MemberLogins as MemberLoginsDB

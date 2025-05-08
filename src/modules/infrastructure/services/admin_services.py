@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from datetime import datetime
 from sqlalchemy.orm import Session
 from modules.application.interfaces.admin_services import AdminServiceInterface

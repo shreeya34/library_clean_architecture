@@ -4,10 +4,13 @@ from modules.infrastructure.database.interfaces import DatabaseManager
 from modules.infrastructure.database.base import Base
 from typing import Generator
 from modules.infrastructure.database.models import *
+from modules.infrastructure.config.settings import Settings
+
+
 
 
 class PostgresManager(DatabaseManager):
-    def __init__(self, settings):
+    def __init__(self, settings: Settings):
         self.settings = settings
         self.engine = None
         self.SessionLocal = None

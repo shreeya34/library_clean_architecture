@@ -22,7 +22,7 @@ from modules.application.models.request.member_request import (
     MemberLoginRequest,
     ReturnBookRequest,
 )
-from modules.infrastructure.security.auth_handler import  signJWT
+from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.logger import get_logger
 from modules.application.models.response.member_response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
@@ -215,5 +215,3 @@ class LibraryMemberService(MemberService):
             db.rollback()
             logger.error(f"Error during login: {str(e)}")
             raise
-
-
