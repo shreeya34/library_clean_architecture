@@ -1,7 +1,6 @@
-from datetime import datetime
 from pydantic import BaseModel
 from typing import List
-
+from uuid import UUID
 
 # admin
 class MemberResponse(BaseModel):
@@ -13,13 +12,8 @@ class MemberResponse(BaseModel):
         orm_mode = True
         from_attributes = True
 
-
 class MembersListResponse(BaseModel):
     filtered_members: List[MemberResponse]
-
-
-from uuid import UUID
-
 
 class BookResponseModel(BaseModel):
     id: UUID

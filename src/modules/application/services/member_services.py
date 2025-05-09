@@ -17,23 +17,22 @@ from modules.domain.exceptions.member.exception import (
 )
 from modules.infrastructure.database.models.member import BorrowedBooks, ReturnBook
 from modules.infrastructure.database.models.admin import Member
-from modules.application.models.request.member_request import (
+from modules.interfaces.request.member_request import (
     BorrowBookRequest,
     MemberLoginRequest,
     ReturnBookRequest,
 )
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.logger import get_logger
-from modules.application.models.response.member_response import BorrowedBookResponse
+from modules.interfaces.response.member_response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
     BookNotBorrowedError,
     DuplicateBookBorrowError,
     InvalidMemberCredentialsError,
 )
-
-
-from modules.application.interfaces.member_services import MemberService
+from modules.domain.services.member_services import MemberService
 from modules.infrastructure.security.password_utils import check_password
+from modules.shared.utils.member_utils import create_borrowed_book_entry, parse_uuid
 
 logger = get_logger()
 
@@ -76,80 +75,33 @@ class LibraryMemberService(MemberService):
         self, book_request: BorrowBookRequest, db: Session, current_user: dict
     ) -> BorrowedBookResponse:
         if current_user.get("is_admin", False):
-            logger.error("Admin user attempted to borrow a book: %s", current_user)
             raise OnlyMembersCanBorrowError()
-        try:
 
-            book_title = book_request.book_title
-            user_id_str = current_user.get("admin_id")
+        user_id = parse_uuid(current_user.get("admin_id", ""))
+        member = self.member_repo.get_member_by_id(db, str(user_id))
+        if not member:
+            raise MemberNotFoundError(str(user_id))
 
-            if not user_id_str:
-                logger.error("Borrow attempt by user without valid user_id in token")
-                raise RaiseUnauthorizedError()
-            try:
-                user_id = uuid.UUID(user_id_str)
-                user_id_str = str(user_id)
-            except ValueError:
-                logger.error("Invalid UUID format for user_id: %s", user_id_str)
-                raise InvalidUUIDError()
+        book = self.member_repo.get_book_by_title(db, book_request.book_title)
+        if not book or book.stock <= 0:
+            raise BookUnavailableError(book_request.book_title)
 
-            member = db.query(Member).filter(Member.member_id == user_id_str).first()
-            if not member:
-                logger.error("Borrow attempt by non-existent member: %s", user_id_str)
-                raise MemberNotFoundError(user_id_str)
+        if self.member_repo.has_already_borrowed(db, book.id, member.member_id):
+            raise DuplicateBookBorrowError(book.title)
 
-            book = self.member_repo.get_book_by_title(db, book_title)
-            if not book or book.stock <= 0:
-                logger.warning("Borrow attempt for unavailable book: %s", book_title)
-                raise BookUnavailableError(book_title)
+        borrowed_book = create_borrowed_book_entry(book, member)
+        book.stock -= 1
+        self.member_repo.save_borrowed_book(db, borrowed_book)
 
-            book_id = book.id
+        return BorrowedBookResponse(
+            title=borrowed_book.title,
+            member_id=borrowed_book.member_id,
+            name=borrowed_book.name,
+            borrow_date=borrowed_book.borrow_date,
+            expiry_date=borrowed_book.expiry_date,
+        )
 
-            member_id_str = member.member_id
-
-            already_borrowed = (
-                db.query(BorrowedBooks)
-                .filter(
-                    BorrowedBooks.book_id == book_id,
-                    BorrowedBooks.member_id == member_id_str,
-                )
-                .first()
-            )
-
-            if already_borrowed:
-                logger.warning(
-                    "Duplicate borrow attempt: %s by user %s", book.title, member.name
-                )
-                raise DuplicateBookBorrowError(book.title)
-
-            borrow_date = datetime.now()
-            expiry_date = borrow_date + timedelta(weeks=2)
-
-            borrowed_book = BorrowedBooks(
-                title=book.title,
-                member_id=member_id_str,
-                book_id=book_id,
-                name=member.name,
-                borrow_date=borrow_date.isoformat(),
-                expiry_date=expiry_date.isoformat(),
-            )
-
-            book.stock -= 1
-            commit_and_refresh(db, borrowed_book)
-
-            logger.info("Book borrowed: %s by %s", book.title, member.name)
-            return BorrowedBookResponse(
-                title=book.title,
-                member_id=member_id_str,
-                name=member.name,
-                borrow_date=borrow_date.isoformat(),
-                expiry_date=expiry_date.isoformat(),
-            )
-        except Exception as e:
-            db.rollback()
-            logger.error(f"Error during login: {str(e)}")
-            raise
-
+  
     def return_book(
         self, return_request: ReturnBookRequest, db: Session, current_user: dict
     ) -> Dict[str, Any]:

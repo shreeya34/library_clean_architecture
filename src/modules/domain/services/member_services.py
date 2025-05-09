@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
-from modules.application.models.request.member_request import (
+from modules.interfaces.request.member_request import (
     MemberLoginRequest,
     BorrowBookRequest,
     ReturnBookRequest,
 )
-from modules.application.models.response.member_response import BorrowedBookResponse
+from modules.interfaces.response.member_response import BorrowedBookResponse
 from typing import Dict, Any
 
 

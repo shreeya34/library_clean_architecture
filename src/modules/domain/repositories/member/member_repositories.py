@@ -17,3 +17,26 @@ class IMemberRepository(ABC):
     @abstractmethod
     def get_book_by_title(self, db: Session, title: str) -> Book:
         pass
+    
+    @abstractmethod
+    def has_already_borrowed(self, db: Session, book_id: int, member_id: str) -> bool:
+        pass
+    
+    @abstractmethod
+    def save_borrowed_book(self, db: Session, borrowed_book):
+        pass
+    
+    @abstractmethod
+    def get_member_by_id(self, db: Session, member_id: str) -> Member:
+        pass
+    
+    @abstractmethod
+    def get_borrowed_book(
+        self, db: Session, book_id: int, member_id: str
+    ) -> Book | None:
+        pass
+    
+    @abstractmethod
+    def delete_borrowed_book(self, db: Session, borrowed_book):
+        pass
+    

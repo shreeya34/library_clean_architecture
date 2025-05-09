@@ -4,12 +4,12 @@ from modules.infrastructure.database.dependency import get_db_from_app
 from modules.infrastructure.dependencies.member_dependencies import get_member_service
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
-from modules.application.models.request.member_request import (
+from modules.interfaces.request.member_request import (
     MemberLoginRequest,
     BorrowBookRequest,
     ReturnBookRequest,
 )
-from modules.application.models.response.member_response import BorrowedBookResponse
+from modules.interfaces.response.member_response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
     BookAlreadyReturnedError,
     BookNotBorrowedError,
@@ -19,7 +19,7 @@ from modules.domain.exceptions.member.exception import (
     RaiseBorrowBookError,
 )
 from modules.infrastructure.logger import get_logger
-from modules.infrastructure.services.member_services import LibraryMemberService
+from modules.application.services.member_services import LibraryMemberService
 
 logger = get_logger()
 

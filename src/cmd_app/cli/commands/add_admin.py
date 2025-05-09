@@ -2,8 +2,8 @@ import click
 from sqlalchemy.orm import Session
 from entrypoints.cli.db_utils import get_db
 from modules.infrastructure.database.postgres_manager import PostgresManager
-from modules.application.models.request.admin_request import CreateModel
-from modules.infrastructure.services.admin_services import AdminService
+from modules.interfaces.request.admin_request import CreateModel
+from modules.application.services.admin_services import AdminService
 from modules.infrastructure.config.settings import Settings
 
 

@@ -8,15 +8,15 @@ from modules.infrastructure.repositories.admin.admin_repositories_impl import (
 )
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
-from modules.application.models.request.admin_request import (
+from modules.interfaces.request.admin_request import (
     CreateModel,
     AdminLogins,
     NewMember,
     NewBooks,
 )
 from entrypoints.api.utils.response_utils import json_response
-from modules.infrastructure.services.admin_services import AdminService
-from modules.application.models.response.admin_response import (
+from modules.application.services.admin_services import AdminService
+from modules.interfaces.response.admin_response import (
     MemberResponse,
     MembersListResponse,
 )

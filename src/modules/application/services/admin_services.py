@@ -1,13 +1,14 @@
 from datetime import datetime
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from modules.application.interfaces.admin_services import AdminServiceInterface
-from modules.application.models.request.admin_request import (
+from modules.domain.services.admin_services import AdminServiceInterface
+from modules.interfaces.request.admin_request import (
     CreateModel,
     AdminLogins,
     NewMember,
     NewBooks,
 )
-from modules.application.models.response.admin_response import (
+from modules.interfaces.response.admin_response import (
     BookResponseModel,
     MemberResponse,
     MembersListResponse,
@@ -112,39 +113,42 @@ class AdminService(AdminServiceInterface):
             raise
 
     def add_member(self, newuser: NewMember, db: Session, current_user: dict) -> dict:
-        self._check_admin(current_user)
-        try:
-            existing_member = self.admin_repo.get_member_by_name(db, newuser.name)
-            if existing_member:
-                logger.warning(f"Member {newuser.name} already exists.")
-                raise MemberAlreadyExistsError(newuser.name)
+            self._check_admin(current_user)
 
-            new_member_id = str(uuid.uuid4())
-            plain_password = generate_random_password()
-            hashed_password = hash_password(plain_password)
+            try:
+                existing_member = self.admin_repo.get_member_by_name(db, newuser.name)
+                if existing_member:
+                    logger.warning(f"Member {newuser.name} already exists.")
+                    raise MemberAlreadyExistsError(newuser.name)
 
-            new_member = Member(
-                member_id=new_member_id,
-                name=newuser.name,
-                password=hashed_password,
-                role=newuser.role,
-            )
+                new_member_id = str(uuid.uuid4())
+                plain_password = generate_random_password()
+                hashed_password = hash_password(plain_password)
 
-            commit_and_refresh(db, new_member)
+                new_member = Member(
+                    member_id=new_member_id,
+                    name=newuser.name,
+                    password=hashed_password,
+                    role=newuser.role,
+                )
 
-            new_member_response = MemberResponse.from_orm(new_member)
+                commit_and_refresh(db, new_member)
 
-            logger.info(f"New member {newuser.name} added successfully.")
+                new_member_response = MemberResponse.from_orm(new_member)
 
-            return {
-                "message": "Member added successfully",
-                "new_member": new_member_response.dict(),
-                "plain_password": plain_password,
-            }
-        except Exception as e:
-            db.rollback()
-            logger.error(f"Failed to add member {newuser.name,}: {str(e)}")
-            raise
+                logger.info(f"New member {newuser.name} added successfully.")
+
+                return {
+                    "message": "Member added successfully",
+                    "new_member": new_member_response.dict(),
+                    "plain_password": plain_password,
+                }
+
+            except Exception as e:
+                db.rollback()
+                logger.error(f"Failed to add member {newuser.name}: {str(e)}")
+                raise HTTPException(status_code=500, detail="An error occurred while adding the member.")
+
 
     def add_books(self, newbook: NewBooks, db: Session, current_user: dict) -> dict:
         self._check_admin(current_user)
