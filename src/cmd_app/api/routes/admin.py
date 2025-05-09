@@ -31,11 +31,8 @@ def create_admin(
     db: Session = Depends(get_db_from_app),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
         result = admin_service.create_admin(admin, db)
         return json_response(status_code=201, content=result)
-    except Exception as e:
-        return json_response(status_code=400, content={"error": str(e)})
 
 
 @router.post("/login")
@@ -44,11 +41,10 @@ def login_admin(
     db: Session = Depends(get_db_from_app),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
+
         login_result = admin_service.login_admin(admin_data, db)
-        return JSONResponse(content=login_result)
-    except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=400)
+        return json_response(status_code=200,content=login_result)
+
 
 
 @router.post("/add_member", dependencies=[Depends(JWTBearer())])
@@ -59,11 +55,8 @@ def add_member(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
         result = admin_service.add_member(newuser, db, user)
         return json_response(status_code=201, content=result)
-    except Exception as e:
-        return json_response(status_code=400, content={"error": str(e)})
 
 
 @router.post("/add_books", dependencies=[Depends(JWTBearer())])
@@ -74,11 +67,9 @@ def add_books(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
         result = admin_service.add_books(newbook, db, user)
         return json_response(status_code=201, content=jsonable_encoder(result))
-    except Exception as e:
-        return json_response(status_code=400, content={"error": str(e)})
+
 
 
 @router.get("/view_available_books", dependencies=[Depends(JWTBearer())])
@@ -89,11 +80,9 @@ def view_books(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
         result = admin_service.view_available_books(title, db, user)
         return json_response(status_code=200, content=result)
-    except Exception as e:
-        return json_response(status_code=400, content={"error": str(e)})
+  
 
 
 @router.get(
@@ -107,11 +96,9 @@ def view_members(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
+  
         result = admin_service.view_all_members(db, user)
         return json_response(status_code=200, content=result.dict())
-    except Exception as e:
-        return json_response(status_code=400, content={"error": str(e)})
 
 
 @router.get(
@@ -126,8 +113,5 @@ def view_members_by_id(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
-    try:
         result = admin_service.view_member_by_id(member_id, db, user)
         return json_response(status_code=200, content=result)
-    except Exception as e:
-        return json_response(status_code=400, content={"error": str(e)})

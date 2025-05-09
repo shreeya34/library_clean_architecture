@@ -52,3 +52,7 @@ class MemberRepository(IMemberRepository):
     def delete_borrowed_book(self, db: Session, borrowed_book: BorrowedBooks):
         db.delete(borrowed_book)
         db.commit()
+        
+    def get_user_by_id(self, db: Session, user_id: str) -> Member:
+        return db.query(Member).filter(Member.member_id == user_id).first()
+

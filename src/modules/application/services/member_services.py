@@ -75,6 +75,7 @@ class LibraryMemberService(MemberService):
         self, book_request: BorrowBookRequest, db: Session, current_user: dict
     ) -> BorrowedBookResponse:
         if current_user.get("is_admin", False):
+            logger.error("Admin user attempted to borrow a book: %s", current_user)
             raise OnlyMembersCanBorrowError()
 
         user_id = parse_uuid(current_user.get("admin_id", ""))
@@ -103,67 +104,69 @@ class LibraryMemberService(MemberService):
 
   
     def return_book(
-        self, return_request: ReturnBookRequest, db: Session, current_user: dict
-    ) -> Dict[str, Any]:
-        """Implementation of book return"""
-        if current_user.get("is_admin", False):
+    self, return_request: ReturnBookRequest, db: Session, current_user: dict
+) -> Dict[str, Any]:
+        """Handles returning a borrowed book by a member."""
+
+        if current_user.get("is_admin"):
             logger.error("Admin user attempted to return a book: %s", current_user)
             raise OnlyMembersReturnBorrowError()
+
+        user_id = current_user.get("admin_id")
+        if not user_id:
+            logger.error("Missing user_id in token")
+            raise RaiseUnauthorizedError()
+
+        member = self._get_valid_member(db, user_id)
+        book = self._get_valid_book(db, return_request.book_title)
+        borrowed_book = self._validate_borrowed_book(db, book.id, member.member_id)
+
+        return_date = datetime.now()
+        self._process_return(db, book, member, borrowed_book, return_date)
+
+        logger.info("Book returned: %s by %s", book.title, member.name)
+        return {
+            "book_title": book.title,
+            "name": member.name,
+            "return_date": return_date.isoformat(),
+        }
+
+    def _get_valid_member(self, db: Session, user_id: int):
+        member = self.member_repo.get_member_by_id(db, user_id)
+        if not member:
+            logger.error("Non-existent member: %s", user_id)
+            raise MemberNotFoundError(user_id)
+        return member
+
+    def _get_valid_book(self, db: Session, title: str):
+        book = self.member_repo.get_book_by_title(db, title)
+        if not book:
+            logger.warning("Non-existent book: %s", title)
+            raise BookNotFoundError(title)
+        return book
+
+    def _validate_borrowed_book(self, db: Session, book_id: int, member_id: int):
+        borrowed_book = self.member_repo.get_borrowed_book(db, book_id, member_id)
+        if not borrowed_book:
+            logger.warning("Book ID %s not borrowed by member ID %s", book_id, member_id)
+            raise BookNotBorrowedError(book_id)
+        return borrowed_book
+
+    def _process_return(
+        self, db: Session, book, member, borrowed_book, return_date: datetime
+    ):
+        returned_book = ReturnBook(
+            title=book.title,
+            member_id=member.member_id,
+            book_id=book.id,
+            name=member.name,
+            return_date=return_date,
+        )
         try:
-            book_title = return_request.book_title
-            user_id = current_user.get("admin_id")
-
-            if not user_id:
-                logger.error("Return attempt by user without valid user_id in token")
-                raise RaiseUnauthorizedError()
-
-            member = db.query(Member).filter(Member.member_id == user_id).first()
-            if not member:
-                logger.error("Return attempt by non-existent member: %s", user_id)
-                raise MemberNotFoundError(user_id)
-
-            book = self.member_repo.get_book_by_title(db, book_title)
-            if not book:
-                logger.warning("Return attempt for non-existent book: %s", book_title)
-                raise BookNotFoundError(book_title)
-
-            borrowed_book = (
-                db.query(BorrowedBooks)
-                .filter(
-                    BorrowedBooks.book_id == book.id,
-                    BorrowedBooks.member_id == member.member_id,
-                )
-                .first()
-            )
-
-            if not borrowed_book:
-                logger.warning(
-                    "Book %s is not borrowed by member %s", book_title, member.name
-                )
-                raise BookNotBorrowedError(book_title)
-
-            return_date = datetime.now()
-            returned_book = ReturnBook(
-                title=book.title,
-                member_id=member.member_id,
-                book_id=book.id,
-                name=member.name,
-                return_date=return_date,
-            )
-            db.delete(borrowed_book)
-            db.commit()
-
+            self.member_repo.delete_borrowed_book(db, borrowed_book)
             book.stock += 1
             commit_and_refresh(db, returned_book)
-
-            logger.info("Book returned: %s by %s", book.title, member.name)
-
-            return {
-                "book_title": book.title,
-                "name": member.name,
-                "return_date": return_date.isoformat(),
-            }
         except Exception as e:
             db.rollback()
-            logger.error(f"Error during login: {str(e)}")
+            logger.error(f"Error during return: {str(e)}")
             raise

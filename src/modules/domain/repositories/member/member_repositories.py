@@ -1,4 +1,3 @@
-# modules/domain/interfaces/member_repository.py
 from abc import ABC, abstractmethod
 from uuid import UUID
 from sqlalchemy.orm import Session
@@ -40,3 +39,6 @@ class IMemberRepository(ABC):
     def delete_borrowed_book(self, db: Session, borrowed_book):
         pass
     
+    @abstractmethod
+    def get_user_by_id(self, db: Session, user_id: str) -> Member:
+        pass
