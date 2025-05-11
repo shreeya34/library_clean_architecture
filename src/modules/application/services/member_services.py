@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Dict, Any
 import uuid
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from modules.domain.repositories.member.member_repositories import IMemberRepository
 from modules.infrastructure.database.utils import commit_and_refresh
@@ -10,6 +11,7 @@ from modules.domain.exceptions.admin.exception import (
     MemberNotFoundError,
 )
 from modules.domain.exceptions.member.exception import (
+    BookAlreadyReturnedError,
     InvalidUUIDError,
     OnlyMembersCanBorrowError,
     OnlyMembersReturnBorrowError,
@@ -66,6 +68,8 @@ class LibraryMemberService(MemberService):
                 "member_id": member.member_id,
                 "token": access_token,
             }
+        except InvalidMemberCredentialsError as e:
+            raise HTTPException(status_code=e.status_code, detail=e.detail)
         except Exception as e:
             db.rollback()
             logger.error(f"Error during login: {str(e)}")
@@ -74,33 +78,41 @@ class LibraryMemberService(MemberService):
     def borrow_book(
         self, book_request: BorrowBookRequest, db: Session, current_user: dict
     ) -> BorrowedBookResponse:
-        if current_user.get("is_admin", False):
-            logger.error("Admin user attempted to borrow a book: %s", current_user)
-            raise OnlyMembersCanBorrowError()
+        try:
+            if current_user.get("is_admin", False):
+                logger.error("Admin user attempted to borrow a book: %s", current_user)
+                raise OnlyMembersCanBorrowError()
 
-        user_id = parse_uuid(current_user.get("admin_id", ""))
-        member = self.member_repo.get_member_by_id(db, str(user_id))
-        if not member:
-            raise MemberNotFoundError(str(user_id))
+            user_id = parse_uuid(current_user.get("admin_id", ""))
+            member = self.member_repo.get_member_by_id(db, str(user_id))
+            if not member:
+                raise MemberNotFoundError(str(user_id))
 
-        book = self.member_repo.get_book_by_title(db, book_request.book_title)
-        if not book or book.stock <= 0:
-            raise BookUnavailableError(book_request.book_title)
+            available_books = self.member_repo.get_available_books_by_title(db, book_request.book_title)
+            if not available_books:
+                raise BookUnavailableError(book_request.book_title)
+            book = available_books[0]
 
-        if self.member_repo.has_already_borrowed(db, book.id, member.member_id):
-            raise DuplicateBookBorrowError(book.title)
 
-        borrowed_book = create_borrowed_book_entry(book, member)
-        book.stock -= 1
-        self.member_repo.save_borrowed_book(db, borrowed_book)
+            if self.member_repo.has_already_borrowed(db, book.id, member.member_id):
+                raise DuplicateBookBorrowError(book.title)
 
-        return BorrowedBookResponse(
-            title=borrowed_book.title,
-            member_id=borrowed_book.member_id,
-            name=borrowed_book.name,
-            borrow_date=borrowed_book.borrow_date,
-            expiry_date=borrowed_book.expiry_date,
-        )
+            borrowed_book = create_borrowed_book_entry(book, member)
+            book.stock -= 1
+            self.member_repo.save_borrowed_book(db, borrowed_book)
+
+            return BorrowedBookResponse(
+                title=borrowed_book.title,
+                member_id=borrowed_book.member_id,
+                name=borrowed_book.name,
+                borrow_date=borrowed_book.borrow_date,
+                expiry_date=borrowed_book.expiry_date,
+            )
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error during borrow_book: {str(e)}")
+            raise
+
 
   
     def return_book(
@@ -166,6 +178,14 @@ class LibraryMemberService(MemberService):
             self.member_repo.delete_borrowed_book(db, borrowed_book)
             book.stock += 1
             commit_and_refresh(db, returned_book)
+            
+        except BookNotBorrowedError as e:
+                logger.warning(str(e))
+                raise HTTPException(status_code=400, detail=str(e))
+        except BookAlreadyReturnedError as e:
+                logger.warning(str(e))
+                raise HTTPException(status_code=400, detail=str(e))
+                raise RaiseBookError()
         except Exception as e:
             db.rollback()
             logger.error(f"Error during return: {str(e)}")

@@ -1,24 +1,25 @@
+from dataclasses import dataclass
 from datetime import datetime
-from pydantic import BaseModel
 
 
-class MemberLoginRequest(BaseModel):
+@dataclass
+class MemberLoginRequest:
     name: str
     password: str
 
 
-class MemberLoginInfo(BaseModel):
+@dataclass
+class MemberLoginInfo:
     name: str
     status: str
     login_time: datetime
 
-    class Config:
-        from_attributes = True
 
-
-class ReturnBookRequest(BaseModel):
+@dataclass
+class ReturnBookRequest:
     book_title: str
 
 
-class BorrowBookRequest(BaseModel):
+@dataclass
+class BorrowBookRequest:
     book_title: str

@@ -84,7 +84,12 @@ class AdminService(AdminServiceInterface):
     def login_admin(self, admin_data: AdminLogins, db: Session) -> dict:
         try:
             admin = self.admin_repo.get_admin_by_username(db, admin_data.username)
-            if not admin or not check_password(admin_data.password, admin.password):
+
+            if not admin:
+                logger.warning(f"Failed login attempt: Admin username {admin_data.username} does not exist.")
+                raise AdminAccessDeniedError(admin_data.username)
+
+            if not check_password(admin_data.password, admin.password):
                 logger.warning(f"Failed login attempt for admin {admin_data.username}")
                 raise InvalidAdminCredentialsError(admin_data.username)
 
@@ -106,11 +111,17 @@ class AdminService(AdminServiceInterface):
                 "token": access_token,
                 "admin_id": admin.admin_id,
             }
-
+        except AdminAccessDeniedError as e:
+            logger.error(f"Access denied for admin {admin_data.username}: {str(e)}")
+            raise e
+        except InvalidAdminCredentialsError as e:
+            logger.error(f"Invalid credentials for admin {admin_data.username}: {str(e)}")
+            raise e
         except Exception as e:
+            logger.error(f"Unexpected error during login for admin {admin_data.username}: {str(e)}")
             db.rollback()
-            logger.error(f"Failed to create admin {admin.username}: {str(e)}")
             raise
+
 
     def add_member(self, newuser: NewMember, db: Session, current_user: dict) -> dict:
         self._check_admin(current_user)

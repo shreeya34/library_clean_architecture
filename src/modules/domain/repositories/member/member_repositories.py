@@ -14,7 +14,7 @@ class IMemberRepository(ABC):
         pass
 
     @abstractmethod
-    def get_book_by_title(self, db: Session, title: str) -> Book:
+    def get_available_books_by_title(self, db: Session, title: str) -> Book:
         pass
     
     @abstractmethod

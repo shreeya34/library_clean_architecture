@@ -42,8 +42,8 @@ class BookNotFoundError(LibraryHTTPException):
         super().__init__(
             status_code=404, detail=f"Book with title '{title}' not found!"
         )
-
-
 class AdminAccessDeniedError(LibraryHTTPException):
-    def __init__(self):
-        super().__init__(status_code=403, detail="Access denied")
+    def __init__(self, username: str):
+        status_code = 403
+        detail = f"Access denied for admin {username}"
+        super().__init__(status_code=status_code, detail=detail)

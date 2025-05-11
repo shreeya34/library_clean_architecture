@@ -1,8 +1,9 @@
+from dataclasses import dataclass
 from datetime import datetime
-from pydantic import BaseModel
 
 
-class BorrowedBookResponse(BaseModel):
+@dataclass
+class BorrowedBookResponse:
     title: str
     member_id: str
     name: str
@@ -10,12 +11,14 @@ class BorrowedBookResponse(BaseModel):
     expiry_date: datetime
 
 
-class BorrowBookSuccessResponse(BaseModel):
+@dataclass
+class BorrowBookSuccessResponse:
     message: str
     borrowed_book: BorrowedBookResponse
 
 
-class ReturnedBookResponse(BaseModel):
+@dataclass
+class ReturnedBookResponse:
     title: str
     member_id: str
     name: str

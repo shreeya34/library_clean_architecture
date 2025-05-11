@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, logger
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from modules.domain.exceptions.admin.exception import AdminAlreadyExistsError, InvalidAdminCredentialsError, MemberAlreadyExistsError
+from modules.domain.exceptions.member.exception import AdminAccessDeniedError
 from modules.infrastructure.database.dependency import get_db_from_app
 from modules.infrastructure.dependencies.admin_dependencies import get_admin_service
-from modules.infrastructure.repositories.admin.admin_repositories_impl import (
-    AdminRepository,
-)
 from modules.infrastructure.security.auth_berarer import JWTBearer
 from modules.infrastructure.security.auth_handler import get_current_user
 from modules.interfaces.request.admin_request import (
@@ -31,8 +30,11 @@ def create_admin(
     db: Session = Depends(get_db_from_app),
     admin_service: AdminService = Depends(get_admin_service),
 ):
+ 
         result = admin_service.create_admin(admin, db)
-        return json_response(status_code=201, content=result)
+        return JSONResponse(status_code=201, content=result)
+  
+
 
 
 @router.post("/login")
@@ -43,7 +45,8 @@ def login_admin(
 ):
 
         login_result = admin_service.login_admin(admin_data, db)
-        return json_response(status_code=200,content=login_result)
+        return JSONResponse(status_code=201,content=login_result)
+ 
 
 
 
@@ -55,8 +58,10 @@ def add_member(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
+  
         result = admin_service.add_member(newuser, db, user)
         return json_response(status_code=201, content=result)
+  
 
 
 @router.post("/add_books", dependencies=[Depends(JWTBearer())])
@@ -67,9 +72,10 @@ def add_books(
     user: dict = Depends(get_current_user),
     admin_service: AdminService = Depends(get_admin_service),
 ):
+    
         result = admin_service.add_books(newbook, db, user)
         return json_response(status_code=201, content=jsonable_encoder(result))
-
+   
 
 
 @router.get("/view_available_books", dependencies=[Depends(JWTBearer())])

@@ -1,24 +1,29 @@
-from typing import  Optional
-from pydantic import BaseModel
+from dataclasses import dataclass
+from typing import Optional
 
 
-class CreateModel(BaseModel):
+@dataclass
+class CreateModel:
     username: str
     password: str
 
 
-class AdminLogins(BaseModel):
+@dataclass
+class AdminLogins:
     username: str
+    password: str
     status: Optional[str] = None
-    password: str
 
 
-class NewMember(BaseModel):
+
+@dataclass
+class NewMember:
     name: str
     role: str
 
 
-class NewBooks(BaseModel):
+@dataclass
+class NewBooks:
     title: str
     author: str
     stock: int

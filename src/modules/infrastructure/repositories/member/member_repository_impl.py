@@ -1,3 +1,4 @@
+from typing import List
 from modules.domain.repositories.member.member_repositories import (
     IMemberRepository,
 )
@@ -23,8 +24,12 @@ class MemberRepository(IMemberRepository):
         commit_and_refresh(db, new_login)
         return new_login
 
-    def get_book_by_title(self, db, title):
-        return db.query(Book).filter(Book.title == title).first()
+    def get_available_books_by_title(self, db: Session, title: str) -> List[Book]:
+        return (
+            db.query(Book)
+            .filter(Book.title == title, Book.stock > 0)
+            .all()
+        )
 
     def has_already_borrowed(self, db: Session, book_id: int, member_id: str) -> bool:
         return (
