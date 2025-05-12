@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List
 from uuid import UUID
 
+
 # admin
 class MemberResponse(BaseModel):
     name: str
@@ -12,8 +13,10 @@ class MemberResponse(BaseModel):
         orm_mode = True
         from_attributes = True
 
+
 class MembersListResponse(BaseModel):
     filtered_members: List[MemberResponse]
+
 
 class BookResponseModel(BaseModel):
     id: UUID

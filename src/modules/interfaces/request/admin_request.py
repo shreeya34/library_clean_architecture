@@ -15,7 +15,6 @@ class AdminLogins:
     status: Optional[str] = None
 
 
-
 @dataclass
 class NewMember:
     name: str
