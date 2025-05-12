@@ -35,11 +35,35 @@ class IAdminRepository(ABC):
         pass
 
     @abstractmethod
-    def get_book_availability_by_book_id(
-        self, db: Session, book_id: int
-    ) -> BookAvailability:
+    def get_existing_book(self, db: Session, newbook: Book) -> Book:
         pass
 
     @abstractmethod
-    def get_existing_book(self, db: Session, newbook: Book) -> Book:
+    def get_books_by_title(self, db: Session, title: str):
+        pass
+
+    @abstractmethod
+    def get_all_books(self, db: Session):
+        pass
+
+    @abstractmethod
+    def get_availability_by_book_id(self, db: Session, book_id: int):
+        pass
+
+    @abstractmethod
+    def add_availability(self, db: Session, availability: BookAvailability):
+        pass
+
+    @abstractmethod
+    def upsert_availability(
+        self, db: Session, book_id: int, title: str, available: bool
+    ):
+        pass
+
+    @abstractmethod
+    def commit(self, db: Session):
+        pass
+
+    @abstractmethod
+    def rollback(self, db: Session):
         pass
