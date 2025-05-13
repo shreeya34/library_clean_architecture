@@ -3,6 +3,7 @@ from modules.domain.repositories.admin.admin_repositories import IAdminRepositor
 from modules.interfaces.response.admin_response import MemberResponse
 from modules.domain.exceptions.admin.exception import MemberNotFoundError
 
+
 class ViewMemberByIdUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo

@@ -2,8 +2,15 @@ from datetime import datetime
 from typing import Any, Dict
 
 from fastapi import HTTPException
-from modules.domain.exceptions.admin.exception import BookNotFoundError, MemberNotFoundError
-from modules.domain.exceptions.member.exception import BookAlreadyReturnedError, BookNotBorrowedError, OnlyMembersReturnBorrowError
+from modules.domain.exceptions.admin.exception import (
+    BookNotFoundError,
+    MemberNotFoundError,
+)
+from modules.domain.exceptions.member.exception import (
+    BookAlreadyReturnedError,
+    BookNotBorrowedError,
+    OnlyMembersReturnBorrowError,
+)
 from modules.domain.repositories.member.member_repositories import IMemberRepository
 from modules.infrastructure.database.models.member import ReturnBook
 from modules.infrastructure.database.utils import commit_and_refresh
@@ -15,7 +22,9 @@ class ReturnBookUseCase:
     def __init__(self, member_repo: IMemberRepository):
         self.member_repo = member_repo
 
-    def execute(self, return_request: ReturnBookRequest, db: Session, current_user: dict) -> Dict[str, Any]:
+    def execute(
+        self, return_request: ReturnBookRequest, db: Session, current_user: dict
+    ) -> Dict[str, Any]:
         if current_user.get("is_admin"):
             raise OnlyMembersReturnBorrowError()
 
@@ -49,7 +58,9 @@ class ReturnBookUseCase:
             raise BookNotBorrowedError(book_id)
         return borrowed_book
 
-    def _process_return(self, db: Session, book, member, borrowed_book, return_date: datetime):
+    def _process_return(
+        self, db: Session, book, member, borrowed_book, return_date: datetime
+    ):
         returned_book = ReturnBook(
             title=book.title,
             member_id=member.member_id,

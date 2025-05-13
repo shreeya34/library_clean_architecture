@@ -1,6 +1,11 @@
-
-from modules.domain.exceptions.admin.exception import BookUnavailableError, MemberNotFoundError
-from modules.domain.exceptions.member.exception import DuplicateBookBorrowError, OnlyMembersCanBorrowError
+from modules.domain.exceptions.admin.exception import (
+    BookUnavailableError,
+    MemberNotFoundError,
+)
+from modules.domain.exceptions.member.exception import (
+    DuplicateBookBorrowError,
+    OnlyMembersCanBorrowError,
+)
 from modules.domain.repositories.member.member_repositories import IMemberRepository
 from modules.interfaces.request.member_request import BorrowBookRequest
 from modules.interfaces.response.member_response import BorrowedBookResponse
@@ -12,7 +17,9 @@ class BorrowBookUseCase:
     def __init__(self, member_repo: IMemberRepository):
         self.member_repo = member_repo
 
-    def execute(self, book_request: BorrowBookRequest, db: Session, current_user: dict) -> BorrowedBookResponse:
+    def execute(
+        self, book_request: BorrowBookRequest, db: Session, current_user: dict
+    ) -> BorrowedBookResponse:
         if current_user.get("is_admin"):
             raise OnlyMembersCanBorrowError()
 
@@ -21,7 +28,9 @@ class BorrowBookUseCase:
         if not member:
             raise MemberNotFoundError(member_id)
 
-        books = self.member_repo.get_available_books_by_title(db, book_request.book_title)
+        books = self.member_repo.get_available_books_by_title(
+            db, book_request.book_title
+        )
         if not books:
             raise BookUnavailableError(book_request.book_title)
 

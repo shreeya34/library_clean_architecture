@@ -9,6 +9,7 @@ from modules.interfaces.response.admin_response import AdminResponseModel
 import uuid
 from dataclasses import asdict
 
+
 class CreateAdminUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
@@ -33,4 +34,8 @@ class CreateAdminUseCase:
         )
         commit_and_refresh(db, member_entity)
 
-        return asdict(AdminResponseModel(admin_id=admin_entity.admin_id, username=admin_entity.username))
+        return asdict(
+            AdminResponseModel(
+                admin_id=admin_entity.admin_id, username=admin_entity.username
+            )
+        )

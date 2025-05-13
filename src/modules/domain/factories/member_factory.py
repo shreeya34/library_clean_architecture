@@ -1,4 +1,3 @@
-
 import uuid
 from modules.infrastructure.database.models.admin import Member
 

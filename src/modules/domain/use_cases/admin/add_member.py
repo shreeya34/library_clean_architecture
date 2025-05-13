@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session
 from modules.domain.factories.member_factory import MemberFactory
 from modules.interfaces.request.admin_request import NewMember
 from modules.interfaces.response.admin_response import MemberAddResponse, MemberResponse
-from modules.infrastructure.security.password_utils import generate_random_password, hash_password
+from modules.infrastructure.security.password_utils import (
+    generate_random_password,
+    hash_password,
+)
 from modules.domain.exceptions.admin.exception import MemberAlreadyExistsError
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.database.models.admin import Member

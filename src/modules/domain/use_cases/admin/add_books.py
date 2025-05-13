@@ -3,8 +3,12 @@ from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.database.models.admin import Book
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
 from modules.interfaces.request.admin_request import NewBooks
-from modules.interfaces.response.admin_response import BookAddResponse, BookResponseModel
+from modules.interfaces.response.admin_response import (
+    BookAddResponse,
+    BookResponseModel,
+)
 import uuid
+
 
 class AddBooksUseCase:
     def __init__(self, admin_repo: IAdminRepository):
@@ -28,4 +32,6 @@ class AddBooksUseCase:
             commit_and_refresh(db, book)
             message = "Book added successfully"
 
-        return BookAddResponse(message=message, new_book=BookResponseModel.from_orm(book)).dict()
+        return BookAddResponse(
+            message=message, new_book=BookResponseModel.from_orm(book)
+        ).dict()

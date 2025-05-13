@@ -14,7 +14,9 @@ class MemberLoginUseCase:
     def __init__(self, member_repo: IMemberRepository):
         self.member_repo = member_repo
 
-    def execute(self, member_login: MemberLoginRequest, db: Session) -> MemberLoginResponse:
+    def execute(
+        self, member_login: MemberLoginRequest, db: Session
+    ) -> MemberLoginResponse:
         member = self.member_repo.get_member_by_name(db, member_login.name)
         if not member or not check_password(member_login.password, member.password):
             logger.warning(f"Invalid credentials for: {member_login.name}")
