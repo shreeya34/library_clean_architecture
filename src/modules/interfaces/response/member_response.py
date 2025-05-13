@@ -1,7 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-
+@dataclass
+class MemberLoginResponse:
+    message: str
+    member_id: str
+    token: str
 @dataclass
 class BorrowedBookResponse:
     title: str

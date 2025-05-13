@@ -9,7 +9,13 @@ from modules.interfaces.request.admin_request import (
     NewBooks,
 )
 from modules.interfaces.response.admin_response import (
+    AdminLoginResponse,
+    AdminResponseModel,
+    BookAddResponse,
+    BookAvailabilityResponse,
     BookResponseModel,
+    BookViewResponse,
+    MemberAddResponse,
     MemberResponse,
     MembersListResponse,
 )
@@ -65,17 +71,24 @@ class AdminService(AdminServiceInterface):
             password=hash_password(admin.password),
             role="admin",
         )
+        commit_and_refresh(db, new_admin)
+
         new_member = Member(
             member_id=str(uuid.uuid4()), 
-            username=admin.username,
+            name=admin.username,
             password=hash_password(admin.password),
             role="admin",
         )
 
-        commit_and_refresh(db, new_admin)
+        commit_and_refresh(db, new_member)
         logger.info(f"Created new admin {admin.username}")
 
-        return {"admin_id": new_admin.admin_id, "username": new_admin.username}#model response
+        admin_response = AdminResponseModel(
+        admin_id=new_admin.admin_id,
+        username=new_admin.username
+    )
+    
+        return admin_response.dict()
 
     @db_exception_handler("login admin")
     def login_admin(self, admin_data: AdminLogins, db: Session) -> dict:
@@ -89,7 +102,8 @@ class AdminService(AdminServiceInterface):
             logger.warning(f"Invalid password for admin {admin_data.username}")
             raise InvalidAdminCredentialsError(admin_data.username)
 
-        token = signJWT(admin.username, admin.admin_id, is_admin=True)
+        token_response = signJWT(admin.username, admin.admin_id, is_admin=True)
+        access_token = token_response.get('access_token') 
 
         commit_and_refresh(
             db,
@@ -103,11 +117,11 @@ class AdminService(AdminServiceInterface):
         )
 
         logger.info(f"Admin {admin_data.username} logged in successfully.")
-        return {
-            "message": "Login successful",
-            "token": token,
-            "admin_id": admin.admin_id,
-        }
+        return AdminLoginResponse(
+            message="Login successful",
+            token=access_token, 
+            admin_id=admin.admin_id
+        )
 
     @db_exception_handler("add new member")
     def add_member(self, newuser: NewMember, db: Session, current_user: dict) -> dict:
@@ -128,11 +142,11 @@ class AdminService(AdminServiceInterface):
         commit_and_refresh(db, new_member)
 
         logger.info(f"New member {newuser.name} added successfully.")
-        return {
-            "message": "Member added successfully",
-            "new_member": MemberResponse.from_orm(new_member).dict(),
-            "plain_password": plain_password,
-        }
+        return MemberAddResponse(
+            message="Member added successfully",
+            new_member=MemberResponse.from_orm(new_member),
+            plain_password=plain_password,
+        ).dict()
 
     @db_exception_handler("add new book")
     def add_books(self, newbook: NewBooks, db: Session, current_user: dict) -> dict:
@@ -156,11 +170,11 @@ class AdminService(AdminServiceInterface):
             message = "Book added successfully"
             logger.info(f"New book {newbook.title} added successfully.")
 
-        return {
-            "message": message,
-            "new_book": BookResponseModel.from_orm(book).dict(),
-        }
-
+        return BookAddResponse(
+            message=message,
+            new_book=BookResponseModel.from_orm(book),
+        ).dict()
+        
     @db_exception_handler("view books")
     def view_available_books(self, title: str, db: Session, current_user: dict) -> dict:
         self._check_admin(current_user)
@@ -172,7 +186,7 @@ class AdminService(AdminServiceInterface):
         )
 
         if not books:
-            return {"message": "No books found with that title"}
+            return BookViewResponse(message="No books found with that title", books=[]).dict()
 
         book_data = []
         for book in books:
@@ -181,16 +195,20 @@ class AdminService(AdminServiceInterface):
 
             if is_available:
                 book_data.append(
-                    {
-                        "title": book.title,
-                        "author": book.author,
-                        "available": is_available,
-                    }
+                    BookAvailabilityResponse(
+                        title=book.title,
+                        author=book.author,
+                        available=is_available,
+                    )
                 )
 
         self.admin_repo.commit(db)
 
-        return {"message": "Books available", "books": book_data}
+       
+        return BookViewResponse(
+            message="Books available",
+            books=book_data,
+        ).dict()
 
     def view_all_members(self, db: Session, current_user: dict) -> MembersListResponse:
         self._check_admin(current_user)
@@ -215,4 +233,4 @@ class AdminService(AdminServiceInterface):
         if not member:
             raise MemberNotFoundError(member_id)
 
-        return {"name": member.name, "role": member.role, "member_id": member.member_id}
+        return MemberResponse(name=member.name, role=member.role, member_id=member.member_id)

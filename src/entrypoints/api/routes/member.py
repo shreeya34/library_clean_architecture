@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from modules.infrastructure.database.dependency import get_db_from_app
@@ -29,12 +30,7 @@ def member_login(
     Endpoint for member login
     """
     login_result = member_service.member_logins(memberLogin, db)
-    return {
-        "message": "Login Success",
-        "member_id": login_result["member_id"],
-        "token": login_result["token"],
-    }
-
+    return asdict(login_result) 
 
 @router.post(
     "/borrow", response_model=BorrowedBookResponse, dependencies=[Depends(JWTBearer())]
