@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, Any
-import uuid
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from modules.domain.repositories.member.member_repositories import IMemberRepository
@@ -12,13 +11,10 @@ from modules.domain.exceptions.admin.exception import (
 )
 from modules.domain.exceptions.member.exception import (
     BookAlreadyReturnedError,
-    InvalidUUIDError,
     OnlyMembersCanBorrowError,
     OnlyMembersReturnBorrowError,
-    RaiseUnauthorizedError,
 )
-from modules.infrastructure.database.models.member import BorrowedBooks, ReturnBook
-from modules.infrastructure.database.models.admin import Member
+from modules.infrastructure.database.models.member import  ReturnBook
 from modules.interfaces.request.member_request import (
     BorrowBookRequest,
     MemberLoginRequest,
@@ -26,7 +22,7 @@ from modules.interfaces.request.member_request import (
 )
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.logger import get_logger
-from modules.interfaces.response.member_response import BorrowedBookResponse
+from modules.interfaces.response.member_response import BorrowedBookResponse, MemberLoginResponse
 from modules.domain.exceptions.member.exception import (
     BookNotBorrowedError,
     DuplicateBookBorrowError,
@@ -48,7 +44,7 @@ class LibraryMemberService(MemberService):
     @db_exception_handler("member login")
     def member_logins(
         self, member_login: MemberLoginRequest, db: Session
-    ) -> Dict[str, Any]:
+    ) -> MemberLoginResponse:
         member = self.member_repo.get_member_by_name(db, member_login.name)
         if not member or not check_password(member_login.password, member.password):
             logger.warning(f"Invalid credentials for: {member_login.name}")
@@ -59,12 +55,13 @@ class LibraryMemberService(MemberService):
         db.commit()
 
         logger.info(f"User {member_login.name} logged in successfully.")
-        return {
-            "message": "Login successful",
-            "member_id": member.member_id,
-            "token": token,
-        }
-
+        
+        return MemberLoginResponse(
+            message="Login successful",
+            member_id=member.member_id,
+            token=token,
+        )
+        
     @db_exception_handler("borrow books")
     def borrow_book(
         self, book_request: BorrowBookRequest, db: Session, current_user: dict

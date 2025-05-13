@@ -1,6 +1,8 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, logger
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from entrypoints.api.dependencies.annotated_deps import AdminServiceDep, CurrentUserDep, DBSessionDep
 from modules.domain.exceptions.admin.exception import (
     AdminAlreadyExistsError,
     InvalidAdminCredentialsError,
@@ -31,8 +33,8 @@ router = APIRouter()
 @router.post("/")
 def create_admin(
     admin: CreateModel,
-    db: Session = Depends(get_db_from_app),
-    admin_service: AdminService = Depends(get_admin_service),
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
 ):
     try:
         result = admin_service.create_admin(admin, db)
@@ -44,8 +46,8 @@ def create_admin(
 @router.post("/login")
 def login_admin(
     admin_data: AdminLogins,
-    db: Session = Depends(get_db_from_app),
-    admin_service: AdminService = Depends(get_admin_service),
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
 ):
     try:
         login_result = admin_service.login_admin(admin_data, db)
@@ -60,9 +62,9 @@ def login_admin(
 def add_member(
     request: Request,
     newuser: NewMember,
-    db: Session = Depends(get_db_from_app),
-    user: dict = Depends(get_current_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
+    user:CurrentUserDep,
 ):
     try:
 
@@ -78,9 +80,9 @@ def add_member(
 def add_books(
     request: Request,
     newbook: NewBooks,
-    db: Session = Depends(get_db_from_app),
-    user: dict = Depends(get_current_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
+    user:CurrentUserDep,
 ):
     try:
         result = admin_service.add_books(newbook, db, user)
@@ -92,10 +94,11 @@ def add_books(
 @router.get("/view_available_books", dependencies=[Depends(JWTBearer())])
 def view_books(
     request: Request,
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
+    user:CurrentUserDep,
     title: str = Query(None),
-    db: Session = Depends(get_db_from_app),
-    user: dict = Depends(get_current_user),
-    admin_service: AdminService = Depends(get_admin_service),
+
 ):
     try:
         result = admin_service.view_available_books(title, db, user)
@@ -111,9 +114,9 @@ def view_books(
 )
 def view_members(
     request: Request,
-    db: Session = Depends(get_db_from_app),
-    user: dict = Depends(get_current_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
+    user:CurrentUserDep,
 ):
     try:
         result = admin_service.view_all_members(db, user)
@@ -130,9 +133,9 @@ def view_members(
 def view_members_by_id(
     member_id: str,
     request: Request,
-    db: Session = Depends(get_db_from_app),
-    user: dict = Depends(get_current_user),
-    admin_service: AdminService = Depends(get_admin_service),
+    db: DBSessionDep,
+    admin_service: AdminServiceDep,
+    user:CurrentUserDep,
 ):
     try:
         result = admin_service.view_member_by_id(member_id, db, user)

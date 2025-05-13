@@ -1,7 +1,5 @@
 import click
-from sqlalchemy.orm import Session
 from entrypoints.cli.db_utils import get_db
-from modules.infrastructure.database.postgres_manager import PostgresManager
 from modules.infrastructure.repositories.admin.admin_repositories_impl import (
     AdminRepository,
 )
