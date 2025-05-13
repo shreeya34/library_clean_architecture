@@ -1,11 +1,8 @@
 from dataclasses import asdict
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from entrypoints.api.dependencies.annotated_deps import CurrentUserDep, DBSessionDep
-from modules.infrastructure.database.dependency import get_db_from_app
 from modules.infrastructure.dependencies.member_dependencies import get_member_service
 from modules.infrastructure.security.auth_berarer import JWTBearer
-from modules.infrastructure.security.auth_handler import get_current_user
 from modules.interfaces.request.member_request import (
     MemberLoginRequest,
     BorrowBookRequest,
@@ -13,6 +10,7 @@ from modules.interfaces.request.member_request import (
 )
 from modules.interfaces.response.member_response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
+    InvalidMemberCredentialsError,
     RaiseBorrowBookError,
 )
 from modules.application.services.member_services import LibraryMemberService
@@ -30,8 +28,12 @@ def member_login(
     """
     Endpoint for member login
     """
-    login_result = member_service.member_logins(memberLogin, db)
-    return asdict(login_result) 
+    try:
+        login_result = member_service.member_logins(memberLogin, db)
+        return asdict(login_result)
+    except InvalidMemberCredentialsError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post(
     "/borrow", response_model=BorrowedBookResponse, dependencies=[Depends(JWTBearer())]
@@ -39,7 +41,7 @@ def member_login(
 def borrow_book(
     book_body: BorrowBookRequest,
     db: DBSessionDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
     member_service: LibraryMemberService = Depends(get_member_service),
 ):
     try:
@@ -56,7 +58,7 @@ def borrow_book(
 def return_books(
     book_body: ReturnBookRequest,
     db: DBSessionDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
     member_service: LibraryMemberService = Depends(get_member_service),
 ):
 
