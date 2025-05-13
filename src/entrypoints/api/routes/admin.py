@@ -2,17 +2,18 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, logger
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from entrypoints.api.dependencies.annotated_deps import AdminServiceDep, CurrentUserDep, DBSessionDep
+from entrypoints.api.dependencies.annotated_deps import (
+    AdminServiceDep,
+    CurrentUserDep,
+    DBSessionDep,
+)
 from modules.domain.exceptions.admin.exception import (
     AdminAlreadyExistsError,
     InvalidAdminCredentialsError,
     MemberAlreadyExistsError,
 )
 from modules.domain.exceptions.member.exception import AdminAccessDeniedError
-from modules.infrastructure.database.dependency import get_db_from_app
-from modules.infrastructure.dependencies.admin_dependencies import get_admin_service
 from modules.infrastructure.security.auth_berarer import JWTBearer
-from modules.infrastructure.security.auth_handler import get_current_user
 from modules.interfaces.request.admin_request import (
     CreateModel,
     AdminLogins,
@@ -64,7 +65,7 @@ def add_member(
     newuser: NewMember,
     db: DBSessionDep,
     admin_service: AdminServiceDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
 ):
     try:
 
@@ -82,7 +83,7 @@ def add_books(
     newbook: NewBooks,
     db: DBSessionDep,
     admin_service: AdminServiceDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
 ):
     try:
         result = admin_service.add_books(newbook, db, user)
@@ -96,9 +97,8 @@ def view_books(
     request: Request,
     db: DBSessionDep,
     admin_service: AdminServiceDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
     title: str = Query(None),
-
 ):
     try:
         result = admin_service.view_available_books(title, db, user)
@@ -116,7 +116,7 @@ def view_members(
     request: Request,
     db: DBSessionDep,
     admin_service: AdminServiceDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
 ):
     try:
         result = admin_service.view_all_members(db, user)
@@ -135,7 +135,7 @@ def view_members_by_id(
     request: Request,
     db: DBSessionDep,
     admin_service: AdminServiceDep,
-    user:CurrentUserDep,
+    user: CurrentUserDep,
 ):
     try:
         result = admin_service.view_member_by_id(member_id, db, user)

@@ -4,7 +4,6 @@ from typing import List
 from uuid import UUID
 
 
-
 @dataclass
 class AdminResponseModel:
     admin_id: str
@@ -12,6 +11,8 @@ class AdminResponseModel:
 
     class Config:
         orm_mode = True
+
+
 @dataclass
 class AdminLoginResponse:
     message: str
@@ -19,8 +20,8 @@ class AdminLoginResponse:
     admin_id: str
 
     class Config:
-        orm_mode = True 
-   
+        orm_mode = True
+
 
 class MemberResponse(BaseModel):
     name: str
@@ -35,7 +36,7 @@ class MemberResponse(BaseModel):
 class MemberAddResponse(BaseModel):
     message: str
     new_member: MemberResponse
-    plain_password: str  
+    plain_password: str
 
 
 class MembersListResponse(BaseModel):
@@ -52,6 +53,8 @@ class BookResponseModel(BaseModel):
     class Config:
         orm_mode = True
         from_attributes = True
+
+
 class BookAddResponse(BaseModel):
     message: str
     new_book: BookResponseModel

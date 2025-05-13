@@ -1,4 +1,3 @@
-
 from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -11,5 +10,3 @@ from modules.application.services.admin_services import AdminService
 DBSessionDep = Annotated[Session, Depends(get_db_from_app)]
 CurrentUserDep = Annotated[dict, Depends(get_current_user)]
 AdminServiceDep = Annotated[AdminService, Depends(get_admin_service)]
-
-

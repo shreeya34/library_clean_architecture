@@ -1,10 +1,9 @@
 from functools import wraps
 from sqlalchemy.orm import Session
 import click
-from modules.infrastructure.logger import get_logger 
+from modules.infrastructure.logger import get_logger
 
 logger = get_logger()
-
 
 
 def db_exception_handler(operation: str):
@@ -23,10 +22,11 @@ def db_exception_handler(operation: str):
 
                 if click.get_current_context(silent=True):
                     click.secho(f"Error: {str(e)}", fg="red")
-                    raise click.Abort() 
+                    raise click.Abort()
                 else:
                     logger.exception(f"Error during {operation}: {str(e)}")
-                    raise e 
+                    raise e
 
         return wrapper
+
     return decorator
