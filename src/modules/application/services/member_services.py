@@ -1,16 +1,15 @@
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 from modules.domain.repositories.member.member_repositories import IMemberRepository
-from modules.domain.use_cases.member.borrow_books import BorrowBookUseCase
-from modules.domain.use_cases.member.member_login import MemberLoginUseCase
-from modules.domain.use_cases.member.return_books import ReturnBookUseCase
+from modules.application.use_cases.member.borrow_books import BorrowBookUseCase
+from modules.application.use_cases.member.member_login import MemberLoginUseCase
+from modules.application.use_cases.member.return_books import ReturnBookUseCase
 
 from modules.interfaces.request.member_request import (
     BorrowBookRequest,
     MemberLoginRequest,
     ReturnBookRequest,
 )
-from modules.infrastructure.logger import get_logger
 from modules.interfaces.response.member_response import (
     BorrowedBookResponse,
     MemberLoginResponse,
@@ -19,7 +18,6 @@ from modules.domain.services.member_services import MemberService
 from modules.infrastructure.security.password_utils import check_password
 from modules.shared.decorators.db_exception_handler import db_exception_handler
 
-logger = get_logger()
 
 
 class LibraryMemberService(MemberService):
