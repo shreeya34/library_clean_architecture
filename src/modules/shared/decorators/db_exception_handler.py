@@ -1,15 +1,16 @@
 from functools import wraps
 from sqlalchemy.orm import Session
-import logging
-import click  # 👈 make sure to import this
+import click
+from modules.infrastructure.logger import get_logger 
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
+
+
 
 def db_exception_handler(operation: str):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Find the db argument
             db = next((arg for arg in args if isinstance(arg, Session)), None)
             if db is None:
                 db = kwargs.get("db")

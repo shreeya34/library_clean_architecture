@@ -4,7 +4,6 @@ from typing import List
 from uuid import UUID
 
 
-# admin
 
 @dataclass
 class AdminResponseModel:
