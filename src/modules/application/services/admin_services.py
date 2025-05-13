@@ -17,7 +17,6 @@ from modules.infrastructure.database.models.admin import (
     Admin,
     AdminLogin,
     Book,
-    BookAvailability,
     Member,
 )
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
@@ -66,11 +65,17 @@ class AdminService(AdminServiceInterface):
             password=hash_password(admin.password),
             role="admin",
         )
+        new_member = Member(
+            member_id=str(uuid.uuid4()), 
+            username=admin.username,
+            password=hash_password(admin.password),
+            role="admin",
+        )
 
         commit_and_refresh(db, new_admin)
         logger.info(f"Created new admin {admin.username}")
 
-        return {"admin_id": new_admin.admin_id, "username": new_admin.username}
+        return {"admin_id": new_admin.admin_id, "username": new_admin.username}#model response
 
     @db_exception_handler("login admin")
     def login_admin(self, admin_data: AdminLogins, db: Session) -> dict:

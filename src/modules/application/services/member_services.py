@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import Dict, Any
-import uuid
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from modules.domain.repositories.member.member_repositories import IMemberRepository
@@ -12,13 +11,10 @@ from modules.domain.exceptions.admin.exception import (
 )
 from modules.domain.exceptions.member.exception import (
     BookAlreadyReturnedError,
-    InvalidUUIDError,
     OnlyMembersCanBorrowError,
     OnlyMembersReturnBorrowError,
-    RaiseUnauthorizedError,
 )
-from modules.infrastructure.database.models.member import BorrowedBooks, ReturnBook
-from modules.infrastructure.database.models.admin import Member
+from modules.infrastructure.database.models.member import  ReturnBook
 from modules.interfaces.request.member_request import (
     BorrowBookRequest,
     MemberLoginRequest,
