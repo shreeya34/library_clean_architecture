@@ -144,11 +144,11 @@ class AdminService(AdminServiceInterface):
         commit_and_refresh(db, new_member)
 
         logger.info(f"New member {newuser.name} added successfully.")
-        return asdict (MemberAddResponse(
+        return  (MemberAddResponse(
             message="Member added successfully",
             new_member=MemberResponse.from_orm(new_member),
             plain_password=plain_password,
-        ))
+        )).dict()
 
     @db_exception_handler("add new book")
     def add_books(self, newbook: NewBooks, db: Session, current_user: dict) -> dict:
@@ -172,10 +172,10 @@ class AdminService(AdminServiceInterface):
             message = "Book added successfully"
             logger.info(f"New book {newbook.title} added successfully.")
 
-        return asdict (BookAddResponse(
+        return (BookAddResponse(
             message=message,
             new_book=BookResponseModel.from_orm(book),
-        ))
+        )).dict()
         
     @db_exception_handler("view books")
     def view_available_books(self, title: str, db: Session, current_user: dict) -> dict:
@@ -207,10 +207,10 @@ class AdminService(AdminServiceInterface):
         self.admin_repo.commit(db)
 
        
-        return asdict (BookViewResponse(
+        return  BookViewResponse(
             message="Books available",
             books=book_data,
-        ))
+        ).dict()
 
     def view_all_members(self, db: Session, current_user: dict) -> MembersListResponse:
         self._check_admin(current_user)
@@ -224,7 +224,7 @@ class AdminService(AdminServiceInterface):
             for member in members
         ]
 
-        return asdict (MembersListResponse(filtered_members=member_data))
+        return MembersListResponse(filtered_members=member_data).dict()
 
     def view_member_by_id(
         self, member_id: str, db: Session, current_user: dict
@@ -235,4 +235,4 @@ class AdminService(AdminServiceInterface):
         if not member:
             raise MemberNotFoundError(member_id)
 
-        return asdict (MemberResponse(name=member.name, role=member.role, member_id=member.member_id))
+        return  (MemberResponse(name=member.name, role=member.role, member_id=member.member_id)).dict()
