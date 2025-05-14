@@ -2,12 +2,14 @@ from sqlalchemy.orm import Session
 from modules.infrastructure.database.models.admin import Admin, Member
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.security.password_utils import hash_password
-from modules.domain.exceptions.admin.exception import AdminAlreadyExistsError, MemberAlreadyExistsError
+from modules.domain.exceptions.admin.exception import (
+    AdminAlreadyExistsError,
+    MemberAlreadyExistsError,
+)
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
 from modules.interfaces.request.admin_request import CreateModel
 from modules.interfaces.response.admin_response import AdminResponseModel
 import uuid
-from dataclasses import asdict
 
 
 def create_admin_entity(username: str, password: str) -> Admin:
@@ -17,6 +19,7 @@ def create_admin_entity(username: str, password: str) -> Admin:
         password=hash_password(password),
         role="admin",
     )
+
 
 def create_member_entity(name: str, password: str) -> Member:
     return Member(
@@ -43,7 +46,8 @@ class CreateAdminUseCase:
         commit_and_refresh(db, admin_entity)
         commit_and_refresh(db, member_entity)
 
-        return asdict(AdminResponseModel(
-            admin_id=admin_entity.admin_id,
-            username=admin_entity.username
-        ))
+        return (
+            AdminResponseModel(
+                admin_id=admin_entity.admin_id, username=admin_entity.username
+            )
+        ).dict()

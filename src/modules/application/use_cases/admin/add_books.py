@@ -4,7 +4,10 @@ from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.database.models.admin import Book
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
 from modules.interfaces.request.admin_request import NewBooks
-from modules.interfaces.response.admin_response import BookAddResponse, BookResponseModel
+from modules.interfaces.response.admin_response import (
+    BookAddResponse,
+    BookResponseModel,
+)
 import uuid
 
 
@@ -16,6 +19,7 @@ def create_new_book(newbook: NewBooks) -> Book:
         stock=newbook.stock,
         available=True,
     )
+
 
 def update_existing_book(book: Book, additional_stock: int) -> Book:
     book.stock += additional_stock

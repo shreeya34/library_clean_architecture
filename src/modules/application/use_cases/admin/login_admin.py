@@ -11,10 +11,11 @@ from modules.domain.exceptions.admin.exception import (
     InvalidAdminCredentialsError,
 )
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
-from dataclasses import asdict
 
 
-def create_admin_login_entity(username: str, password: str, member_id: str) -> AdminLogin:
+def create_admin_login_entity(
+    username: str, password: str, member_id: str
+) -> AdminLogin:
     return AdminLogin(
         username=username,
         status="success",
@@ -54,4 +55,6 @@ class LoginAdminUseCase:
 
         commit_and_refresh(db, login_entity)
 
-        return asdict(create_login_response(token_response["access_token"], admin.admin_id))
+        return (
+            create_login_response(token_response["access_token"], admin.admin_id)
+        ).dict()

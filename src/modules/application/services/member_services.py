@@ -15,9 +15,7 @@ from modules.interfaces.response.member_response import (
     MemberLoginResponse,
 )
 from modules.domain.services.member_services import MemberService
-from modules.infrastructure.security.password_utils import check_password
 from modules.shared.decorators.db_exception_handler import db_exception_handler
-
 
 
 class LibraryMemberService(MemberService):

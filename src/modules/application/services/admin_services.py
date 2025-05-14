@@ -33,14 +33,13 @@ class AdminService(AdminServiceInterface):
     def create_admin(self, admin: CreateModel, db: Session) -> dict:
         return CreateAdminUseCase(self.admin_repo).execute(db, admin)
 
-
     @db_exception_handler("login admin")
     def login_admin(self, admin_data: AdminLogins, db: Session) -> dict:
         return LoginAdminUseCase(self.admin_repo).execute(db, admin_data)
 
     @db_exception_handler("add new member")
     def add_member(self, newuser: NewMember, db: Session, current_user: dict) -> dict:
-        
+
         self._check_admin(current_user)
         use_case = AddMemberUseCase(self.admin_repo)
         response = use_case.execute(db, newuser)
@@ -55,15 +54,25 @@ class AdminService(AdminServiceInterface):
     def view_available_books(self, title: str, db: Session, current_user: dict) -> dict:
         self._check_admin(current_user)
         return ViewBooksUseCase(self.admin_repo).execute(db, title)
-    
-    
-    @db_exception_handler("view members")
-    def view_all_members(self, db: Session, current_user: dict, limit: int, offset: int, page: int, page_size: int) -> dict:
-        self._check_admin(current_user)
-        return ViewMembersUseCase(self.admin_repo).execute(db, limit, offset, page, page_size)
 
-    
+    @db_exception_handler("view members")
+    def view_all_members(
+        self,
+        db: Session,
+        current_user: dict,
+        limit: int,
+        offset: int,
+        page: int,
+        page_size: int,
+    ) -> dict:
+        self._check_admin(current_user)
+        return ViewMembersUseCase(self.admin_repo).execute(
+            db, limit, offset, page, page_size
+        )
+
     @db_exception_handler("view member by ID")
-    def view_member_by_id(self, member_id: str, db: Session, current_user: dict) -> dict:
+    def view_member_by_id(
+        self, member_id: str, db: Session, current_user: dict
+    ) -> dict:
         self._check_admin(current_user)
         return ViewMemberByIdUseCase(self.admin_repo).execute(db, member_id)

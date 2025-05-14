@@ -7,8 +7,10 @@ class ViewMembersUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
 
-    def execute(self, db: Session,limit:int,offset:int,page:int,page_size:int) -> dict:
-        members,total_count = self.admin_repo.get_all_members(db,limit,offset)
+    def execute(
+        self, db: Session, limit: int, offset: int, page: int, page_size: int
+    ) -> dict:
+        members, total_count = self.admin_repo.get_all_members(db, limit, offset)
         if not members:
             return {"message": "No members found"}
 

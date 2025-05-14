@@ -9,9 +9,7 @@ from modules.interfaces.response.admin_response import (
 def book_response(book) -> tuple:
     is_available = book.stock > 0
     response = (
-        BookAvailabilityResponse(
-            title=book.title, author=book.author, available=True
-        )
+        BookAvailabilityResponse(title=book.title, author=book.author, available=True)
         if is_available
         else None
     )

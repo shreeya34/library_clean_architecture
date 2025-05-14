@@ -49,4 +49,3 @@ class BorrowBookUseCase:
             borrow_date=borrowed.borrow_date,
             expiry_date=borrowed.expiry_date,
         )
-   

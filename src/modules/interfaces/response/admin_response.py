@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 from pydantic import BaseModel
 from typing import List
 from uuid import UUID
 
 
-@dataclass
-class AdminResponseModel:
+# Admin Response Models
+class AdminResponseModel(BaseModel):
     admin_id: str
     username: str
 
@@ -13,8 +12,7 @@ class AdminResponseModel:
         orm_mode = True
 
 
-@dataclass
-class AdminLoginResponse:
+class AdminLoginResponse(BaseModel):
     message: str
     token: str
     admin_id: str
@@ -23,6 +21,7 @@ class AdminLoginResponse:
         orm_mode = True
 
 
+# Member Response Models
 class MemberResponse(BaseModel):
     name: str
     role: str
@@ -40,9 +39,10 @@ class MemberAddResponse(BaseModel):
 
 
 class MembersListResponse(BaseModel):
-    filtered_members: list[MemberResponse]
+    filtered_members: List[MemberResponse]
 
 
+# Book Response Models
 class BookResponseModel(BaseModel):
     id: UUID
     title: str
