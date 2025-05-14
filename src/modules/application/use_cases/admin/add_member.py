@@ -1,5 +1,3 @@
-# modules/domain/use_cases/add_member_use_case.py
-
 import uuid
 from sqlalchemy.orm import Session
 from modules.domain.factories.member_factory import MemberFactory
@@ -15,6 +13,16 @@ from modules.infrastructure.database.models.admin import Member
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
 
 
+def generate_credentials() -> tuple[str, str]:
+    plain = generate_random_password()
+    hashed = hash_password(plain)
+    return plain, hashed
+
+
+def create_new_member(name: str, role: str, hashed_password: str) -> Member:
+    return MemberFactory.create_member(name=name, role=role, password=hashed_password)
+
+
 class AddMemberUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
@@ -23,14 +31,9 @@ class AddMemberUseCase:
         if self.admin_repo.get_member_by_name(db, newuser.name):
             raise MemberAlreadyExistsError(newuser.name)
 
-        plain_password = generate_random_password()
-        hashed_password = hash_password(plain_password)
+        plain_password, hashed_password = generate_credentials()
 
-        new_member = MemberFactory.create_member(
-            name=newuser.name,
-            role=newuser.role,
-            password=hashed_password,
-        )
+        new_member = create_new_member(newuser.name, newuser.role, hashed_password)
 
         commit_and_refresh(db, new_member)
 

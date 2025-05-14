@@ -58,9 +58,10 @@ class AdminService(AdminServiceInterface):
     
     
     @db_exception_handler("view members")
-    def view_all_members(self, db: Session, current_user: dict) -> dict:
+    def view_all_members(self, db: Session, current_user: dict, limit: int, offset: int, page: int, page_size: int) -> dict:
         self._check_admin(current_user)
-        return ViewMembersUseCase(self.admin_repo).execute(db)
+        return ViewMembersUseCase(self.admin_repo).execute(db, limit, offset, page, page_size)
+
     
     @db_exception_handler("view member by ID")
     def view_member_by_id(self, member_id: str, db: Session, current_user: dict) -> dict:

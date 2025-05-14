@@ -6,6 +6,18 @@ from modules.interfaces.response.admin_response import (
 )
 
 
+def book_response(book) -> tuple:
+    is_available = book.stock > 0
+    response = (
+        BookAvailabilityResponse(
+            title=book.title, author=book.author, available=True
+        )
+        if is_available
+        else None
+    )
+    return is_available, response
+
+
 class ViewBooksUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
@@ -21,15 +33,15 @@ class ViewBooksUseCase:
             return BookViewResponse(message="No books found", books=[]).dict()
 
         result = []
+
         for book in books:
-            is_available = book.stock > 0
+            is_available, response = book_response(book)
+
             self.admin_repo.upsert_availability(db, book.id, book.title, is_available)
-            if is_available:
-                result.append(
-                    BookAvailabilityResponse(
-                        title=book.title, author=book.author, available=True
-                    )
-                )
+
+            if response:
+                result.append(response)
 
         self.admin_repo.commit(db)
+
         return BookViewResponse(message="Books available", books=result).dict()

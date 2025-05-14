@@ -19,8 +19,10 @@ class AdminRepository(IAdminRepository):
     def get_member_by_name(self, db: Session, name: str) -> Member:
         return db.query(Member).filter(Member.name == name).first()
 
-    def get_all_members(self, db: Session) -> list[Member]:
-        return db.query(Member).all()
+    def get_all_members(self, db: Session, limit: int, offset: int) -> tuple[list[Member], int]:
+        members = db.query(Member).offset(offset).limit(limit).all()
+        total_count = db.query(Member).count()
+        return members, total_count
 
     def get_view_member_by_id(self, db: Session, member_id: str) -> ViewMembers:
         return db.query(ViewMembers).filter(ViewMembers.member_id == member_id).first()
