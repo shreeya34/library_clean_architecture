@@ -117,10 +117,21 @@ def view_members(
     db: DBSessionDep,
     admin_service: AdminServiceDep,
     user: CurrentUserDep,
+    page:int = 1,
+    page_size:int = 10,
 ):
     try:
-        result = admin_service.view_all_members(db, user)
-        return json_response(status_code=200, content=result.dict())
+        offset = (page - 1) * page_size
+        limit = page_size
+        result = admin_service.view_all_members(
+            db=db,
+            current_user=user,  
+            limit=limit,
+            offset=offset,
+            page=page,
+            page_size=page_size
+    )        
+        return json_response(status_code=200, content=result)
     except AdminAccessDeniedError as e:
         raise HTTPException(status_code=403, detail=str(e))
 

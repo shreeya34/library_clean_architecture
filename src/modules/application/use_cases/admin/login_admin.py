@@ -14,6 +14,24 @@ from modules.domain.repositories.admin.admin_repositories import IAdminRepositor
 from dataclasses import asdict
 
 
+def create_admin_login_entity(username: str, password: str, member_id: str) -> AdminLogin:
+    return AdminLogin(
+        username=username,
+        status="success",
+        login_time=datetime.utcnow(),
+        password=password,
+        member_id=member_id,
+    )
+
+
+def create_login_response(token: str, admin_id: str) -> AdminLoginResponse:
+    return AdminLoginResponse(
+        message="Login successful",
+        token=token,
+        admin_id=admin_id,
+    )
+
+
 class LoginAdminUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
@@ -27,21 +45,13 @@ class LoginAdminUseCase:
             raise InvalidAdminCredentialsError(login_data.username)
 
         token_response = signJWT(admin.username, admin.admin_id, is_admin=True)
-        commit_and_refresh(
-            db,
-            AdminLogin(
-                username=login_data.username,
-                status="success",
-                login_time=datetime.utcnow(),
-                password=login_data.password,
-                member_id=admin.admin_id,
-            ),
+
+        login_entity = create_admin_login_entity(
+            username=login_data.username,
+            password=login_data.password,
+            member_id=admin.admin_id,
         )
 
-        return asdict(
-            AdminLoginResponse(
-                message="Login successful",
-                token=token_response.get("access_token"),
-                admin_id=admin.admin_id,
-            )
-        )
+        commit_and_refresh(db, login_entity)
+
+        return asdict(create_login_response(token_response["access_token"], admin.admin_id))
