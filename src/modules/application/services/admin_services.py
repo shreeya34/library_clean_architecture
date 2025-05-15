@@ -17,7 +17,7 @@ from modules.domain.repositories.admin.admin_repositories import IAdminRepositor
 from modules.domain.exceptions.admin.exception import (
     AdminAccessDeniedError,
 )
-from modules.shared.decorators.db_exception_handler import db_exception_handler
+from modules.infrastructure.shared.decorators.db_exception_handler import db_exception_handler
 
 
 class AdminService(AdminServiceInterface):
