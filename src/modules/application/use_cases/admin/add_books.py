@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from modules.infrastructure.database.utils import commit_and_refresh
 from modules.infrastructure.database.models.admin import Book
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
-from modules.interfaces.request.admin_request import NewBooks
-from modules.interfaces.response.admin_response import (
+from entrypoints.api.admin.request import NewBooks
+from entrypoints.api.admin.response import (
     BookAddResponse,
     BookResponseModel,
 )
@@ -31,7 +31,7 @@ class AddBooksUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
 
-    def execute(self, db: Session, newbook: NewBooks) -> dict:
+    def add_or_update_book(self, db: Session, newbook: NewBooks) -> dict:
         existing_book: Optional[Book] = self.admin_repo.get_existing_book(db, newbook)
 
         if existing_book:

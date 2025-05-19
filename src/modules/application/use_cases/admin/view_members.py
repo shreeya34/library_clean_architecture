@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
-from modules.interfaces.response.admin_response import MembersListResponse
+from entrypoints.api.admin.response import MembersListResponse
 
 
 class ViewMembersUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
 
-    def execute(
+    def view_members(
         self, db: Session, limit: int, offset: int, page: int, page_size: int
     ) -> dict:
         members, total_count = self.admin_repo.get_all_members(db, limit, offset)

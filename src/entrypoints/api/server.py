@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from entrypoints.api.middleware.exception_handlers import ExceptionHandlerMiddleware
 from modules.infrastructure.config.settings import settings
 from modules.infrastructure.logger import get_logger
-from entrypoints.api.routes import admin as admin_routes
-from entrypoints.api.routes import member as member_routes
+from entrypoints.api.admin import routes as admin_routes
+from entrypoints.api.member import routes as member_routes
 from contextlib import asynccontextmanager
 from modules.infrastructure.database.postgres_manager import PostgresManager
 

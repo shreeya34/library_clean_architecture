@@ -3,12 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from entrypoints.api.dependencies.annotated_deps import CurrentUserDep, DBSessionDep
 from modules.infrastructure.dependencies.member_dependencies import get_member_service
 from modules.infrastructure.security.auth_berarer import JWTBearer
-from modules.interfaces.request.member_request import (
+from entrypoints.api.member.request import (
     MemberLoginRequest,
     BorrowBookRequest,
     ReturnBookRequest,
 )
-from modules.interfaces.response.member_response import BorrowedBookResponse
+from entrypoints.api.member.member_response import BorrowedBookResponse
 from modules.domain.exceptions.member.exception import (
     InvalidMemberCredentialsError,
     RaiseBorrowBookError,

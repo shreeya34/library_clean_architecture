@@ -3,8 +3,8 @@ from modules.domain.repositories.member.member_repositories import IMemberReposi
 from modules.infrastructure.logger import get_logger
 from modules.infrastructure.security.auth_handler import signJWT
 from modules.infrastructure.security.password_utils import check_password
-from modules.interfaces.request.member_request import MemberLoginRequest
-from modules.interfaces.response.member_response import MemberLoginResponse
+from entrypoints.api.member.request import MemberLoginRequest
+from entrypoints.api.member.member_response import MemberLoginResponse
 from sqlalchemy.orm import Session
 
 logger = get_logger()
@@ -14,7 +14,7 @@ class MemberLoginUseCase:
     def __init__(self, member_repo: IMemberRepository):
         self.member_repo = member_repo
 
-    def execute(
+    def login_member(
         self, member_login: MemberLoginRequest, db: Session
     ) -> MemberLoginResponse:
         member = self.member_repo.get_member_by_name(db, member_login.name)

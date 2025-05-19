@@ -1,7 +1,5 @@
-from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, logger
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
 from entrypoints.api.dependencies.annotated_deps import (
     AdminServiceDep,
     CurrentUserDep,
@@ -14,15 +12,14 @@ from modules.domain.exceptions.admin.exception import (
 )
 from modules.domain.exceptions.member.exception import AdminAccessDeniedError
 from modules.infrastructure.security.auth_berarer import JWTBearer
-from modules.interfaces.request.admin_request import (
+from entrypoints.api.admin.request import (
     CreateModel,
     AdminLogins,
     NewMember,
     NewBooks,
 )
 from entrypoints.api.utils.response_utils import json_response
-from modules.application.services.admin_services import AdminService
-from modules.interfaces.response.admin_response import (
+from entrypoints.api.admin.response import (
     MemberResponse,
     MembersListResponse,
 )

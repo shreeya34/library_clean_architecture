@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from modules.domain.repositories.admin.admin_repositories import IAdminRepository
-from modules.interfaces.response.admin_response import (
+from entrypoints.api.admin.response import (
     BookViewResponse,
     BookAvailabilityResponse,
 )
@@ -20,7 +20,7 @@ class ViewBooksUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
 
-    def execute(self, db: Session, title: str = "") -> dict:
+    def view_books(self, db: Session, title: str = "") -> dict:
         books = (
             self.admin_repo.get_books_by_title(db, title)
             if title

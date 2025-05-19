@@ -1,9 +1,10 @@
 import click
 from entrypoints.cli.db_utils import get_db
+from modules.application.use_cases.admin.add_books import AddBooksUseCase
 from modules.infrastructure.repositories.admin.admin_repositories_impl import (
     AdminRepository,
 )
-from modules.interfaces.request.admin_request import NewBooks
+from entrypoints.api.admin.request import NewBooks
 from modules.application.services.admin_services import AdminService
 from modules.infrastructure.config.settings import Settings
 
@@ -21,16 +22,19 @@ def add_book(title: str, author: str, stock: int):
     """
     Add a new book to the system.
     """
-
     db = get_db()
     book_data = NewBooks(title=title, author=author, stock=stock)
+
     admin_repo = AdminRepository()
-    admin_service = AdminService(admin_repo)
+    add_books_usecase = AddBooksUseCase(admin_repo)
 
-    mock_user = {"username": "admin", "is_admin": True}
-    admin_service.add_books(book_data, db, mock_user)
+    result = add_books_usecase.add_or_update_book(db, book_data)
 
-    click.echo(f"Book '{title}' by {author} added successfully with {stock} in stock.")
+    click.echo(result["message"])
+    click.echo(
+        f"Book '{result['new_book']['title']}' by {result['new_book']['author']} "
+        f"now has {result['new_book']['stock']} in stock."
+    )
 
 
 if __name__ == "__main__":

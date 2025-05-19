@@ -5,12 +5,12 @@ from modules.application.use_cases.member.borrow_books import BorrowBookUseCase
 from modules.application.use_cases.member.member_login import MemberLoginUseCase
 from modules.application.use_cases.member.return_books import ReturnBookUseCase
 
-from modules.interfaces.request.member_request import (
+from entrypoints.api.member.request import (
     BorrowBookRequest,
     MemberLoginRequest,
     ReturnBookRequest,
 )
-from modules.interfaces.response.member_response import (
+from entrypoints.api.member.member_response import (
     BorrowedBookResponse,
     MemberLoginResponse,
 )
@@ -28,14 +28,14 @@ class LibraryMemberService(MemberService):
         self, member_login: MemberLoginRequest, db: Session
     ) -> MemberLoginResponse:
         usecase = MemberLoginUseCase(self.member_repo)
-        return usecase.execute(member_login, db)
+        return usecase.login_member(member_login, db)
 
     @db_exception_handler("borrow books")
     def borrow_book(
         self, book_request: BorrowBookRequest, db: Session, current_user: dict
     ) -> BorrowedBookResponse:
         usecase = BorrowBookUseCase(self.member_repo)
-        return usecase.execute(book_request, db, current_user)
+        return usecase.borrow_books(book_request, db, current_user)
 
     @db_exception_handler("return books")
     def return_book(
@@ -44,4 +44,4 @@ class LibraryMemberService(MemberService):
         """Handles returning a borrowed book by a member."""
 
         usecase = ReturnBookUseCase(self.member_repo)
-        return usecase.execute(return_request, db, current_user)
+        return usecase.return_books(return_request, db, current_user)

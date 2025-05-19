@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.orm import Session
-from modules.interfaces.request.admin_request import (
+from entrypoints.api.admin.request import (
     CreateModel,
     AdminLogins,
     NewMember,
     NewBooks,
 )
-from modules.interfaces.response.admin_response import (
+from entrypoints.api.admin.response import (
     MemberResponse,
     MembersListResponse,
 )

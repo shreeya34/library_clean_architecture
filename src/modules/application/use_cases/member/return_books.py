@@ -15,14 +15,14 @@ from modules.domain.repositories.member.member_repositories import IMemberReposi
 from modules.infrastructure.database.models.member import ReturnBook
 from modules.infrastructure.database.utils import commit_and_refresh
 from sqlalchemy.orm import Session
-from modules.interfaces.request.member_request import ReturnBookRequest
+from entrypoints.api.member.request import ReturnBookRequest
 
 
 class ReturnBookUseCase:
     def __init__(self, member_repo: IMemberRepository):
         self.member_repo = member_repo
 
-    def execute(
+    def return_books(
         self, return_request: ReturnBookRequest, db: Session, current_user: dict
     ) -> Dict[str, Any]:
         if current_user.get("is_admin"):

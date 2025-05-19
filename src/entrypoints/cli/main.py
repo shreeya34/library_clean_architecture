@@ -1,7 +1,7 @@
 import click
-from cmd_app.cli.commands.add_admin import add_admin
-from cmd_app.cli.commands.add_book import add_book
-from cmd_app.cli.commands.create_tables import create_tables
+from entrypoints.cli.commands.add_admin import add_admin
+from entrypoints.cli.commands.add_book import add_book
+from entrypoints.cli.commands.create_tables import create_tables
 
 
 @click.group()

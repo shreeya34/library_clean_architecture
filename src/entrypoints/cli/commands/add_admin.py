@@ -1,9 +1,10 @@
 import click
 from entrypoints.cli.db_utils import get_db
+from modules.application.use_cases.admin.create_admin import CreateAdminUseCase
 from modules.infrastructure.repositories.admin.admin_repositories_impl import (
     AdminRepository,
 )
-from modules.interfaces.request.admin_request import CreateModel
+from entrypoints.api.admin.request import CreateModel
 from modules.application.services.admin_services import AdminService
 
 
@@ -16,13 +17,15 @@ def add_admin(username, password):
     """Create a new admin account"""
     db = get_db()
     try:
-        admin_repo = AdminRepository()
-        admin_service = AdminService(admin_repo)
+        admin_repo = AdminRepository() 
+        create_admin_usecase = CreateAdminUseCase(admin_repo)
 
-        admin_service.create_admin(
-            CreateModel(username=username, password=password), db
+        result = create_admin_usecase.register_admin(
+            db=db,
+            admin=CreateModel(username=username, password=password)
         )
-        click.secho(f"Admin '{username}' created successfully!", fg="green")
+
+        click.secho(f"Admin '{result['username']}' created successfully!", fg="green")
 
     except Exception as e:
         click.secho(f"Unexpected Error: {e}", fg="red")

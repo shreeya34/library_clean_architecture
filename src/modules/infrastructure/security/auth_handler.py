@@ -5,6 +5,8 @@ import jwt
 from dotenv import load_dotenv
 import os
 
+from modules.domain.exceptions.member.exception import RaiseUnauthorizedError
+
 load_dotenv()
 
 
@@ -46,7 +48,7 @@ def get_current_user(authorization: str = Header(...)) -> dict:
     try:
         scheme, token = authorization.split()
         if scheme.lower() != "bearer":
-            raise HTTPException(status_code=401, detail="Invalid token scheme")
+            raise RaiseUnauthorizedError("Invalid token scheme")
 
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
 
@@ -56,5 +58,5 @@ def get_current_user(authorization: str = Header(...)) -> dict:
             "admin_id": payload.get("user_id"),
         }
 
-    except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    except ValueError as e:
+        raise RaiseUnauthorizedError("Invalid authorization header format") from e

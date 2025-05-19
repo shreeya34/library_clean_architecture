@@ -7,17 +7,19 @@ from modules.domain.exceptions.member.exception import (
     OnlyMembersCanBorrowError,
 )
 from modules.domain.repositories.member.member_repositories import IMemberRepository
-from modules.interfaces.request.member_request import BorrowBookRequest
-from modules.interfaces.response.member_response import BorrowedBookResponse
-from modules.shared.utils.member_utils import create_borrowed_book_entry, parse_uuid
+from entrypoints.api.member.request import BorrowBookRequest
+from entrypoints.api.member.member_response import BorrowedBookResponse
 from sqlalchemy.orm import Session
+
+from modules.infrastructure.factories.borrowing import create_borrowed_book_entry
+from modules.infrastructure.utils.validation import parse_uuid
 
 
 class BorrowBookUseCase:
     def __init__(self, member_repo: IMemberRepository):
         self.member_repo = member_repo
 
-    def execute(
+    def borrow_books(
         self, book_request: BorrowBookRequest, db: Session, current_user: dict
     ) -> BorrowedBookResponse:
         if current_user.get("is_admin"):

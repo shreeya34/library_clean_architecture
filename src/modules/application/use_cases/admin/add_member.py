@@ -1,8 +1,8 @@
 import uuid
 from sqlalchemy.orm import Session
 from modules.domain.factories.member_factory import MemberFactory
-from modules.interfaces.request.admin_request import NewMember
-from modules.interfaces.response.admin_response import MemberAddResponse, MemberResponse
+from entrypoints.api.admin.request import NewMember
+from entrypoints.api.admin.response import MemberAddResponse, MemberResponse
 from modules.infrastructure.security.password_utils import (
     generate_random_password,
     hash_password,
@@ -27,7 +27,7 @@ class AddMemberUseCase:
     def __init__(self, admin_repo: IAdminRepository):
         self.admin_repo = admin_repo
 
-    def execute(self, db: Session, newuser: NewMember) -> MemberAddResponse:
+    def register_member(self, db: Session, newuser: NewMember) -> MemberAddResponse:
         if self.admin_repo.get_member_by_name(db, newuser.name):
             raise MemberAlreadyExistsError(newuser.name)
 

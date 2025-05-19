@@ -36,7 +36,7 @@ allow-direct-references = true
 packages = ["src/library_clean_architecture"]
 
 [tool.rye.scripts]
-main = "fastapi dev server.py"
+main = "fastapi dev entrypoints/api/server.py"
 
 [project.scripts]
 cli = "entrypoints.cli.main:cli"
